@@ -158,6 +158,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     }
 
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
+
         public MyPagerAdapter(android.support.v4.app.FragmentManager fm)
         {
             super(fm);
