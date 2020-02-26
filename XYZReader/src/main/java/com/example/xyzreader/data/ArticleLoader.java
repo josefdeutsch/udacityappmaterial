@@ -1,9 +1,10 @@
 package com.example.xyzreader.data;
 
 import android.content.Context;
-import android.content.CursorLoader;
 import android.database.Cursor;
 import android.net.Uri;
+//import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
 /**
