@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -18,6 +19,8 @@ import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
+import com.example.xyzreader.ui.components.DynamicHeightNetworkImageView;
+import com.example.xyzreader.ui.components.ImageLoaderHelper;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,8 +43,7 @@ import android.support.v7.widget.Toolbar;
  * activity presents a grid of items as cards.
  */
 
-public class ArticleListActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+public class ArticleListActivity extends AppCompatActivity {
 
     private static final String TAG = ArticleListActivity.class.toString();
     private Toolbar mToolbar;
@@ -54,20 +56,24 @@ public class ArticleListActivity extends AppCompatActivity implements
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
 
+    private Adapter mAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article_list);
-
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
 
 
         final View toolbarContainerView = findViewById(R.id.toolbar_container);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        getSupportLoaderManager().initLoader(0, null, this);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refresh();
+            }
+        });
 
         if (savedInstanceState == null) {
             refresh();
@@ -97,7 +103,32 @@ public class ArticleListActivity extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
+                Log.d(TAG, "onReceive: ");
                 mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
+
+                getSupportLoaderManager().restartLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
+                    @NonNull
+                    @Override
+                    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+                        return ArticleLoader.newAllArticlesInstance(getApplicationContext());
+                    }
+
+                    @Override
+                    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+                        mAdapter = new Adapter(data);
+                        mAdapter.setHasStableIds(true);
+                        mRecyclerView.setAdapter(mAdapter);
+                        int columnCount = getResources().getInteger(R.integer.list_column_count);
+                        StaggeredGridLayoutManager sglm =
+                                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
+                        mRecyclerView.setLayoutManager(sglm);
+                    }
+
+                    @Override
+                    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+                        mRecyclerView.setAdapter(null);
+                    }
+                });;
                 updateRefreshingUI();
             }
         }
@@ -105,28 +136,6 @@ public class ArticleListActivity extends AppCompatActivity implements
 
     private void updateRefreshingUI() {
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
-    }
-
-    @NonNull
-    @Override
-    public android.support.v4.content.Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return ArticleLoader.newAllArticlesInstance(this);
-    }
-
-    @Override
-    public void onLoadFinished(@NonNull android.support.v4.content.Loader<Cursor> loader, Cursor data) {
-        Adapter adapter = new Adapter(data);
-        adapter.setHasStableIds(true);
-        mRecyclerView.setAdapter(adapter);
-        int columnCount = getResources().getInteger(R.integer.list_column_count);
-        StaggeredGridLayoutManager sglm =
-                new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
-        mRecyclerView.setLayoutManager(sglm);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mRecyclerView.setAdapter(null);
     }
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {

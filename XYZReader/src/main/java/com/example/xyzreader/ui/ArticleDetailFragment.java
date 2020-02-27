@@ -32,11 +32,13 @@ import com.example.xyzreader.data.ArticleLoader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.graphics.Palette;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
+import com.example.xyzreader.ui.components.ImageLoaderHelper;
+import com.example.xyzreader.ui.components.ObservableScrollView;
+
 import android.support.annotation.NonNull;
 import android.support.v4.app.ShareCompat;
 
