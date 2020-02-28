@@ -247,23 +247,24 @@ public class ArticleDetailFragment extends Fragment implements
 
             }
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
-            final int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
                             //bitmap.setWidth(320);
-                            imageContainer.getBitmap().setWidth(320);
-                            Bitmap bTMP = Bitmap.createBitmap(100, 100,
-                                    Bitmap.Config.ARGB_8888);
-                            bTMP.eraseColor(Color.RED);
+                            //imageContainer.getBitmap().setWidth(320);
+                            //Bitmap bTMP = Bitmap.createBitmap(100, 100,
+                            //        Bitmap.Config.ARGB_8888);
+                            // bTMP.eraseColor(Color.RED);
+                            //final int width = Resources.getSystem().getDisplayMetrics().widthPixels;
                             if (bitmap != null) {
                                 Palette p = Palette.generate(bitmap, 12);
                                 mMutedColor = p.getDarkMutedColor(0xFF333333);
 
 
-                                //mPhotoView.setImageBitmap(bTMP);
+                                mPhotoView.setImageBitmap(imageContainer.getBitmap());
 
                                 //https://stackoverflow.com/questions/40450023/caused-by-java-lang-nullpointerexception-attempt-to-invoke-virtual-method-int
 
