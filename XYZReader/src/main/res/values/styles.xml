@@ -23,8 +23,12 @@
         <item name="colorAccent">@color/theme_accent</item>
     </style>
 
-    <style name="Theme.Bacon.NoActionBar.Detail">
+    <style name="Theme.Bacon.Detail">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
     <style name="Theme.Bacon.NoActionBar">
@@ -38,5 +42,11 @@
     <style name="Theme.Bacon.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="Theme.Bacon.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:windowActionBarOverlay">false</item>
+        <!-- Support library compatibility -->
+        <item name="windowActionBarOverlay">false</item>
+    </style>
 
 </resources>

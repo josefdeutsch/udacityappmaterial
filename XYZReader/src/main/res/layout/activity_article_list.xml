@@ -19,7 +19,6 @@
             android:background="?attr/colorPrimary"
             android:theme="@style/Theme.Bacon.AppBarOverlay"
             app:popupTheme="@style/Theme.Bacon.PopupOverlay">
-            >
 
         </android.support.v7.widget.Toolbar>
 

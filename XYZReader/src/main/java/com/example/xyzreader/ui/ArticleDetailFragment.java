@@ -2,6 +2,7 @@ package com.example.xyzreader.ui;
 
 
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
@@ -16,17 +17,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 
@@ -101,14 +112,43 @@ public class ArticleDetailFragment extends Fragment implements
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
         }
-
         mIsCard = getResources().getBoolean(R.bool.detail_is_card);
         mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
                 R.dimen.detail_card_top_margin);
+
+        setTrasparentStatusBar();
         setHasOptionsMenu(true);
-
-
     }
+
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setTrasparentStatusBar() {
+        Window window = getActivity().getWindow();
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+        window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparentSatusBar));
+
+        window.setNavigationBarColor(ContextCompat.getColor(getActivity(), android.R.color.black));
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    getActivity().finishAfterTransition();
+                    return true;
+                }
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    /**@Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.main_appbar).setVisible(true);
+        super.onPrepareOptionsMenu(menu);
+    }**/
 
     public ArticleDetailActivity getActivityCast() {
         return (ArticleDetailActivity) getActivity();
@@ -253,21 +293,12 @@ public class ArticleDetailFragment extends Fragment implements
                         @Override
                         public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
                             Bitmap bitmap = imageContainer.getBitmap();
-                            //bitmap.setWidth(320);
-                            //imageContainer.getBitmap().setWidth(320);
-                            //Bitmap bTMP = Bitmap.createBitmap(100, 100,
-                            //        Bitmap.Config.ARGB_8888);
-                            // bTMP.eraseColor(Color.RED);
-                            //final int width = Resources.getSystem().getDisplayMetrics().widthPixels;
+
                             if (bitmap != null) {
                                 Palette p = Palette.generate(bitmap, 12);
                                 mMutedColor = p.getDarkMutedColor(0xFF333333);
-
-
-                                mPhotoView.setImageBitmap(imageContainer.getBitmap());
-
-                                //https://stackoverflow.com/questions/40450023/caused-by-java-lang-nullpointerexception-attempt-to-invoke-virtual-method-int
-
+                                Glide.with(getActivity()).load(imageContainer.getBitmap())
+                                        .transition(DrawableTransitionOptions.withCrossFade()).into(mPhotoView);
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
                                 updateStatusBar();

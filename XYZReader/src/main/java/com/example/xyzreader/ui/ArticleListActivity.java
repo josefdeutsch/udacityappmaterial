@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -61,6 +62,7 @@ public class ArticleListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_article_list);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
@@ -83,6 +85,7 @@ public class ArticleListActivity extends AppCompatActivity {
     }
 
     private void refresh() {
+
         startService(new Intent(this, UpdaterService.class));
     }
 
@@ -97,6 +100,13 @@ public class ArticleListActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         unregisterReceiver(mRefreshingReceiver);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.clear();
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     private boolean mIsRefreshing = false;
@@ -137,6 +147,7 @@ public class ArticleListActivity extends AppCompatActivity {
     };
 
     private void updateRefreshingUI() {
+
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
     }
 

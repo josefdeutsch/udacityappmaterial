@@ -15,7 +15,6 @@ public class ImageLoaderHelper {
         if (sInstance == null) {
             sInstance = new ImageLoaderHelper(context.getApplicationContext());
         }
-
         return sInstance;
     }
 
@@ -29,9 +28,9 @@ public class ImageLoaderHelper {
             public void putBitmap(String key, Bitmap value) {
                 mImageCache.put(key, value);
             }
-
             @Override
             public Bitmap getBitmap(String key) {
+
                 return mImageCache.get(key);
             }
         };

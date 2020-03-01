@@ -24,4 +24,5 @@
     <color name="dividerColor">#1f000000</color>
     <color name="secondaryTextColor">#99000000</color>
     <color name="ltgray">#ffe0e0e0</color>
+    <color name="transparentSatusBar">#80000000</color>
 </resources>
