@@ -59,9 +59,8 @@ public class DrawInsetsFrameLayout extends FrameLayout {
         final TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.DrawInsetsFrameLayout, defStyle, 0);
         assert a != null;
-
+        Log.d(TAG, "init: ");
         mInsetBackground = a.getDrawable(R.styleable.DrawInsetsFrameLayout_insetBackground);
-
         a.recycle();
     }
 
@@ -75,6 +74,7 @@ public class DrawInsetsFrameLayout extends FrameLayout {
         }
 
         mInsetBackground = insetBackground;
+        setWillNotDraw(false);
         postInvalidateOnAnimation();
     }
 
@@ -104,6 +104,7 @@ public class DrawInsetsFrameLayout extends FrameLayout {
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
         insets = super.onApplyWindowInsets(insets);
+        Log.d(TAG, "onApplyWindowInsets: ");
         mInsets = new Rect(
                 insets.getSystemWindowInsetLeft(),
                 insets.getSystemWindowInsetTop(),

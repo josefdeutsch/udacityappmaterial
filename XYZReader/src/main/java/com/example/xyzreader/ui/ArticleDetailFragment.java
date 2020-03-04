@@ -1,68 +1,39 @@
 package com.example.xyzreader.ui;
 
-
-
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.res.Resources;
+import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.util.AttributeSet;
 import android.view.WindowInsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.format.DateUtils;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
-
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.graphics.Palette;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
-import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.ObservableScrollView;
-import com.squareup.picasso.Picasso;
-
 import android.support.annotation.NonNull;
-import android.support.v4.app.ShareCompat;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -124,12 +95,12 @@ public class ArticleDetailFragment extends Fragment implements
         mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
                 R.dimen.detail_card_top_margin);
 
-        setTrasparentStatusBar();
+        setTransparentStatusBar();
         setHasOptionsMenu(true);
     }
 
 
-    private void setTrasparentStatusBar() {
+    private void setTransparentStatusBar() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getActivity().getWindow();
@@ -143,7 +114,6 @@ public class ArticleDetailFragment extends Fragment implements
             } else {
                 getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
             }
-            int statusBarColor = Color.TRANSPARENT;
             window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparentSatusBar));
         }
     }
@@ -172,46 +142,45 @@ public class ArticleDetailFragment extends Fragment implements
         getLoaderManager().initLoader(0, null, this);
     }
 
+
+    @Override
+    public void onInflate(Context context, AttributeSet attrs,
+                          Bundle savedInstanceState) {
+        super.onInflate(context, attrs, savedInstanceState);
+        mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(),attrs,3);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
+
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
+        mRootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        setTransparentStatusBar();
+        mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
 
-       // mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
-        //mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast());
-        final View containers = mRootView.findViewById(R.id.container);
 
-        ViewCompat.setOnApplyWindowInsetsListener(containers, new OnApplyWindowInsetsListener() {
-            private static final String TAG = "ArticleDetailFragment";
-
+        mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-                //you can do something with insets..
-
-                int statusBar = insets.getSystemWindowInsetTop(); //this is height of statusbar
-                int navigationBar = insets.getStableInsetBottom(); //this is height of navigationbar
-                Log.d(TAG, String.format("%s %s", statusBar, navigationBar));
-                setTrasparentStatusBar();
-                Toolbar toolbar = containers.findViewById(R.id.toolbar);
-                toolbar.setTitleMargin(0, statusBar, 0, 0);
-
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                insets = mDrawInsetsFrameLayout.onApplyWindowInsets(insets);
                 insets.consumeSystemWindowInsets();
                 return insets;
             }
         });
-        setTrasparentStatusBar();
-      //  containers.setBackgroundColor(Color.BLUE);
 
-     /**   mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
+         mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
             @Override
             public void onInsetsChanged(Rect insets) {
                 mTopInset = insets.top;
+                Log.d(TAG, "onInsetsChanged: "+mTopInset);
             }
         });
 
+
          mStatusBarColorDrawable = new ColorDrawable(0);
-         mStatusBarColorDrawable.setColor(Color.BLUE);
-         mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);**/
+         mStatusBarColorDrawable.setColor(Color.RED);
+         mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
 
         /**
         mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
@@ -243,6 +212,29 @@ public class ArticleDetailFragment extends Fragment implements
         return mRootView;
     }
 
+    private void viewappcompat() {
+        //Framelayout...
+        final View containers = mRootView.findViewById(R.id.container);
+        ViewCompat.setOnApplyWindowInsetsListener(containers, new OnApplyWindowInsetsListener() {
+            private static final String TAG = "ArticleDetailFragment";
+
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                //you can do something with insets..
+
+                int statusBar = insets.getSystemWindowInsetTop(); //this is height of statusbar
+                int navigationBar = insets.getStableInsetBottom(); //this is height of navigationbar
+                Log.d(TAG, String.format("%s %s", statusBar, navigationBar));
+                setTransparentStatusBar();
+                Toolbar toolbar = containers.findViewById(R.id.toolbar);
+                toolbar.setTitleMargin(0, statusBar, 0, 0);
+
+                insets.consumeSystemWindowInsets();
+                return insets;
+            }
+        });
+    }
+
     private void updateStatusBar() {
         int color = 0;
         if (mPhotoView != null && mTopInset != 0 && mScrollY > 0) {
@@ -254,6 +246,9 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.green(mMutedColor) * 0.9),
                     (int) (Color.blue(mMutedColor) * 0.9));
         }
+        mStatusBarColorDrawable = new ColorDrawable(0);
+        mStatusBarColorDrawable.setColor(Color.BLUE);
+        mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
 
     }
 
