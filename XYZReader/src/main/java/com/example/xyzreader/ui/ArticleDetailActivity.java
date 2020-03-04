@@ -1,6 +1,7 @@
 package com.example.xyzreader.ui;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
+import android.view.WindowManager;
+
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
@@ -110,9 +113,9 @@ public class ArticleDetailActivity extends AppCompatActivity
       //  Toolbar toolbar = findViewById(R.id.toolbar);
        // setSupportActionBar(toolbar);
        // getSupportActionBar().setDisplayShowTitleEnabled(false);
-        final Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
+      //  final Toolbar toolbar = findViewById(R.id.toolbar);
+      //  setSupportActionBar(toolbar);
+     //   getSupportActionBar().setDisplayShowTitleEnabled(false);
 
     }
     @Override

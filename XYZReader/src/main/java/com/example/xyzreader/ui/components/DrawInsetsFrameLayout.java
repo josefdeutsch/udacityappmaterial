@@ -23,6 +23,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.WindowInsets;
 import android.widget.FrameLayout;
 
@@ -34,7 +35,7 @@ public class DrawInsetsFrameLayout extends FrameLayout {
     private Drawable mTopInsetBackground;
     private Drawable mBottomInsetBackground;
     private Drawable mSideInsetBackground;
-
+    private static final String TAG = "DrawInsetsFrameLayout";
     private Rect mInsets;
     private Rect mTempRect = new Rect();
     private OnInsetsCallback mOnInsetsCallback;
@@ -123,6 +124,7 @@ public class DrawInsetsFrameLayout extends FrameLayout {
         int height = getHeight();
 
         if (mInsets != null) {
+            Log.d(TAG, "draw: ");
             // Top
             mTempRect.set(0, 0, width, mInsets.top);
             if (mInsetBackground != null) {
