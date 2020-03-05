@@ -2,9 +2,15 @@ package com.example.xyzreader.ui;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v7.graphics.Palette;
+import android.text.Html;
+import android.text.format.DateUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.WindowInsets;
 import java.text.ParseException;
@@ -26,14 +32,21 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
+import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.ObservableScrollView;
 import android.support.annotation.NonNull;
+import android.widget.TextView;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -95,7 +108,6 @@ public class ArticleDetailFragment extends Fragment implements
         mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
                 R.dimen.detail_card_top_margin);
 
-        setTransparentStatusBar();
         setHasOptionsMenu(true);
     }
 
@@ -177,27 +189,35 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-
          mStatusBarColorDrawable = new ColorDrawable(0);
-         mStatusBarColorDrawable.setColor(Color.RED);
-         mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
 
-        /**
-        mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
+        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
+
+        mPhotoContainerView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                int statusBar = insets.getSystemWindowInsetTop();
+                mPhotoContainerView.setTranslationY(statusBar);
+                insets.consumeSystemWindowInsets();
+                return insets;
+            }
+        });
+
+       /** mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
         mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
             @Override
             public void onScrollChanged() {
                 mScrollY = mScrollView.getScrollY();
                 getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
                 mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
-              //  updateStatusBar();
+                updateStatusBar();
             }
-        });
+        });**/
 
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
-        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
 
-        mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
+
+       /** mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
@@ -205,10 +225,10 @@ public class ArticleDetailFragment extends Fragment implements
                         .setText("Some sample text")
                         .getIntent(), getString(R.string.action_share)));
             }
-        });
+        });**/
 
         bindViews();
-        //updateStatusBar();**/
+        updateStatusBar();
         return mRootView;
     }
 
@@ -246,7 +266,6 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.green(mMutedColor) * 0.9),
                     (int) (Color.blue(mMutedColor) * 0.9));
         }
-        mStatusBarColorDrawable = new ColorDrawable(0);
         mStatusBarColorDrawable.setColor(Color.BLUE);
         mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
 
@@ -278,23 +297,23 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     private void bindViews() {
-      /**  if (mRootView == null) {
+       if (mRootView == null) {
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+   /**     TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
         bylineView.setMovementMethod(new LinkMovementMethod());
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
 
 
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-
+**/
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+       /**     titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 bylineView.setText(Html.fromHtml(
@@ -315,7 +334,7 @@ public class ArticleDetailFragment extends Fragment implements
 
             }
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
-
+**/
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
@@ -327,9 +346,9 @@ public class ArticleDetailFragment extends Fragment implements
                                 mMutedColor = p.getDarkMutedColor(0xFF333333);
                                 Glide.with(getActivity()).load(imageContainer.getBitmap())
                                         .transition(DrawableTransitionOptions.withCrossFade()).into(mPhotoView);
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mMutedColor);
-                               // updateStatusBar();
+                            //    mRootView.findViewById(R.id.meta_bar)
+                            //            .setBackgroundColor(mMutedColor);
+                                updateStatusBar();
                             }
                         }
 
@@ -340,10 +359,10 @@ public class ArticleDetailFragment extends Fragment implements
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            titleView.setText("N/A");
-            bylineView.setText("N/A" );
-            bodyView.setText("N/A");
-        }**/
+         //   titleView.setText("N/A");
+        //    bylineView.setText("N/A" );
+        //    bodyView.setText("N/A");
+        }
     }
 
     @Override
@@ -367,13 +386,13 @@ public class ArticleDetailFragment extends Fragment implements
             mCursor = null;
         }
 
-        //bindViews();
+        bindViews();
     }
 
     @Override
     public void onLoaderReset(@NonNull android.support.v4.content.Loader<Cursor> loader) {
         mCursor = null;
-        //bindViews();
+        bindViews();
     }
 
     public int getUpButtonFloor() {

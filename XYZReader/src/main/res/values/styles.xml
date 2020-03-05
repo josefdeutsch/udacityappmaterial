@@ -38,10 +38,6 @@
 
     <style name="Theme.Bacon.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="CustomActionBar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:windowActionBarOverlay">false</item>
-        <!-- Support library compatibility -->
-        <item name="windowActionBarOverlay">false</item>
-    </style>
+
 
 </resources>
