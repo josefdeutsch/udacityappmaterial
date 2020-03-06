@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.android.volley.AuthFailureError;
@@ -62,11 +63,13 @@ import android.support.v4.content.Loader;
 
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
+import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
 import com.example.xyzreader.ui.components.ObservableScrollView;
 import com.google.gson.JsonObject;
 
 
 import android.support.annotation.NonNull;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,7 +101,7 @@ public class ArticleDetailFragment extends Fragment implements
     private ObservableScrollView mScrollView;
     private DrawInsetsFrameLayout mDrawInsetsFrameLayout;
     private ColorDrawable mStatusBarColorDrawable;
-
+    private View linearcontainer;
     private int mTopInset;
     private View mPhotoContainerView;
     private ImageView mPhotoView;
@@ -193,6 +196,7 @@ public class ArticleDetailFragment extends Fragment implements
                           Bundle savedInstanceState) {
         super.onInflate(context, attrs, savedInstanceState);
         mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(), attrs);
+        MaxWidthLinearLayout maxWidthLinearLayout = new MaxWidthLinearLayout(getActivityCast(),attrs);
 
     }
 
@@ -204,7 +208,6 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         setTransparentStatusBar();
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
-
 
         mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
@@ -225,18 +228,19 @@ public class ArticleDetailFragment extends Fragment implements
 
         mStatusBarColorDrawable = new ColorDrawable(0);
 
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
-        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
-
-        mPhotoContainerView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+        linearcontainer = mRootView.findViewById(R.id.linearcontainer);
+        linearcontainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
                 int statusBar = insets.getSystemWindowInsetTop();
-                mPhotoContainerView.setTranslationY(statusBar);
+                linearcontainer.setTranslationY(statusBar);
                 insets.consumeSystemWindowInsets();
                 return insets;
             }
         });
+
+        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
 
         mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
         mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
@@ -261,7 +265,7 @@ public class ArticleDetailFragment extends Fragment implements
         });**/
 
         bindViews();
-        //updateStatusBar();
+        updateStatusBar();
         return mRootView;
     }
 
@@ -289,89 +293,18 @@ public class ArticleDetailFragment extends Fragment implements
     }
 
     private void updateStatusBar() {
-        int color = 0;
 
-        if (mPhotoView != null) {
-            // String str = "TopInset :"+String.valueOf(mTopInset);
-            // String str2 = "mScrollY :"+String.valueOf(mScrollY);
-            //Toast.makeText(getActivityCast(),str+" "+str2, Toast.LENGTH_SHORT).show();
-
-
-        }
         if (mPhotoView != null && mTopInset != 0 && mScrollY > 0) {
             float f = progress(mScrollY,
                     mStatusBarFullOpacityBottom - mTopInset * 3,
                     mStatusBarFullOpacityBottom - mTopInset);
-            color = Color.argb((int) (255 * f),
+            mStatusBarColorDrawable.setColor(Color.argb(Color.alpha(mMutedColor),
                     (int) (Color.red(mMutedColor) * 0.9),
                     (int) (Color.green(mMutedColor) * 0.9),
-                    (int) (Color.blue(mMutedColor) * 0.9));
-             Log.d(TAG, "updateStatusBar: "+color);
-            // Toast.makeText(getActivityCast(),color, Toast.LENGTH_SHORT).show();
-
+                    (int) (Color.blue(mMutedColor) * 0.9)));
 
         }
-        //mStatusBarColorDrawable.setColor(Color.BLUE);
-
-        connected();
-
-
-    }
-
-    public void connected() {
-
-        Dispatcher dispatcher = new Dispatcher();
-        dispatcher.setMaxRequests(1);
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .dispatcher(dispatcher)
-                .build();
-
-        okhttp3.Request request = new  okhttp3.Request.Builder()
-                .addHeader("x-rapidapi-host","convert-colors.p.rapidapi.com")
-                .addHeader("x-rapidapi-key", key)
-                .url(URL)
-                .build();
-
-
-        client.newCall(request).enqueue(new Callback() {
-
-
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onResponse(Call call, okhttp3.Response response) throws IOException {
-                if(response.isSuccessful()){
-
-                    try {
-                        final JSONObject wrapper = new JSONObject(response.body().string());
-                        final JSONObject color = wrapper.getJSONObject("output");
-                        final String hex = color.getString("color");
-                        String prefix = "0xFF"+hex;
-                        //final String prefix = "0xFF"+hex;
-                       // int value = Convert.ToInt32(hex, 16);
-
-
-                        mDrawInsetsFrameLayout.setInsetBackground(new ColorDrawable(Color.parseColor(null)));
-
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                }
-                if (!response.isSuccessful()) {
-                    throw new IOException("Unexpected code " + response);
-                } else {
-
-                }
-            }
-        });
-
+        mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
     }
 
 
@@ -405,19 +338,19 @@ public class ArticleDetailFragment extends Fragment implements
                 return;
             }
 
-            /**   TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+               TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
              TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
              bylineView.setMovementMethod(new LinkMovementMethod());
              TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
 
 
              bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-             **/
+
             if (mCursor != null) {
                 mRootView.setAlpha(0);
                 mRootView.setVisibility(View.VISIBLE);
                 mRootView.animate().alpha(1);
-                /**  titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+                titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
                  Date publishedDate = parsePublishedDate();
                  if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                  bylineView.setText(Html.fromHtml(
@@ -438,7 +371,7 @@ public class ArticleDetailFragment extends Fragment implements
 
                  }
                  bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
-                 **/
+
                 ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                         .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                             @Override
@@ -450,8 +383,8 @@ public class ArticleDetailFragment extends Fragment implements
                                     mMutedColor = p.getDarkMutedColor(0xFF333333);
                                     Glide.with(getActivity()).load(imageContainer.getBitmap())
                                             .transition(DrawableTransitionOptions.withCrossFade()).into(mPhotoView);
-                                    //    mRootView.findViewById(R.id.meta_bar)
-                                    //           .setBackgroundColor(mMutedColor);
+                                        mRootView.findViewById(R.id.meta_bar)
+                                           .setBackgroundColor(mMutedColor);
                                     updateStatusBar();
                                 }
                             }
@@ -463,9 +396,9 @@ public class ArticleDetailFragment extends Fragment implements
                         });
             } else {
                 mRootView.setVisibility(View.GONE);
-                //   titleView.setText("N/A");
-                //   bylineView.setText("N/A" );
-                //  bodyView.setText("N/A");
+                   titleView.setText("N/A");
+                bylineView.setText("N/A" );
+             bodyView.setText("N/A");
             }
         }
 
