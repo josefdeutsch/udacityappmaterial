@@ -8,36 +8,11 @@
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-    <android.support.design.widget.AppBarLayout
+    <FrameLayout
         android:id="@+id/up_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.Bacon.AppBarOverlay"
-        android:fitsSystemWindows="true"
-        android:background="@android:color/transparent"
-
-        >
-        <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="?actionBarSize">
-                <android.support.v7.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    app:layout_scrollFlags="scroll"
-
-                    android:theme="@style/Theme.Bacon.AppBarOverlay"
-                    app:popupTheme="@style/Theme.Bacon.PopupOverlay">
-                </android.support.v7.widget.Toolbar>
-            </FrameLayout>
-
+>
                 <ImageButton
                     android:id="@+id/action_up"
                     android:layout_width="56dp"
@@ -45,10 +20,9 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:contentDescription="@string/up"
                     android:src="@drawable/ic_arrow_back"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"></ImageButton>
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+                </ImageButton>
 
-        </android.support.design.widget.CollapsingToolbarLayout>
-
-    </android.support.design.widget.AppBarLayout>
+    </FrameLayout>
 
 </android.support.design.widget.CoordinatorLayout>
