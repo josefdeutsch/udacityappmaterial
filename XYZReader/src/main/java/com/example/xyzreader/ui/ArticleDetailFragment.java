@@ -62,6 +62,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
+import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
 import com.example.xyzreader.ui.components.ObservableScrollView;
@@ -70,6 +71,7 @@ import com.google.gson.JsonObject;
 
 import android.support.annotation.NonNull;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -108,7 +110,7 @@ public class ArticleDetailFragment extends Fragment implements
     private int mScrollY = 1;
     private boolean mIsCard = false;
     private int mStatusBarFullOpacityBottom;
-
+    private View mMaxWidthContainer;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
@@ -196,7 +198,6 @@ public class ArticleDetailFragment extends Fragment implements
                           Bundle savedInstanceState) {
         super.onInflate(context, attrs, savedInstanceState);
         mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(), attrs);
-        MaxWidthLinearLayout maxWidthLinearLayout = new MaxWidthLinearLayout(getActivityCast(),attrs);
 
     }
 
@@ -208,7 +209,7 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         setTransparentStatusBar();
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
-
+        mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
@@ -228,7 +229,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         mStatusBarColorDrawable = new ColorDrawable(0);
 
-        linearcontainer = mRootView.findViewById(R.id.linearcontainer);
+        linearcontainer = mRootView.findViewById(R.id.relativecontainer);
         linearcontainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
@@ -266,6 +267,8 @@ public class ArticleDetailFragment extends Fragment implements
 
         bindViews();
         updateStatusBar();
+
+
         return mRootView;
     }
 
@@ -381,11 +384,19 @@ public class ArticleDetailFragment extends Fragment implements
                                 if (bitmap != null) {
                                     Palette p = Palette.generate(bitmap, 12);
                                     mMutedColor = p.getDarkMutedColor(0xFF333333);
-                                    Glide.with(getActivity()).load(imageContainer.getBitmap())
-                                            .transition(DrawableTransitionOptions.withCrossFade()).into(mPhotoView);
+                                    GlideApp.with(getActivity())
+                                            .load(imageContainer.getBitmap())
+                                            .centerCrop()
+                                            .into(mPhotoView);
                                         mRootView.findViewById(R.id.meta_bar)
                                            .setBackgroundColor(mMutedColor);
-                                    updateStatusBar();
+
+                                        //FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mMaxWidthContainer.getLayoutParams();
+                                   // int height=  mPhotoView.getMaxHeight();
+                                   // Log.d(TAG, "onResponse: "+height);
+                                   // params.setMargins(0,0,height,0);
+//
+                                  updateStatusBar();
                                 }
                             }
 
