@@ -21,6 +21,8 @@ import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
+import com.example.xyzreader.R;
+
 /**
  * A simple {@link LinearLayout} subclass that has a maxWidth
  */
@@ -52,15 +54,18 @@ public class MaxWidthLinearLayout extends LinearLayout {
     }
 
     public void init(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        TypedArray a = context.obtainStyledAttributes(attrs, ATTRS);
-        mMaxWidth = a.getLayoutDimension(0, Integer.MAX_VALUE);
+        TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.MaxWidthLinearLayout);
+        mMaxWidth = a.getDimensionPixelSize(R.styleable.MaxWidthLinearLayout_maxWidth, Integer.MAX_VALUE);
         a.recycle();
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int newSpecWidth = Math.min(MeasureSpec.getSize(widthMeasureSpec), mMaxWidth);
-        widthMeasureSpec = MeasureSpec.makeMeasureSpec(newSpecWidth, MeasureSpec.getMode(widthMeasureSpec));
+        int measuredWidth = MeasureSpec.getSize(widthMeasureSpec);
+        if (mMaxWidth > 0 && mMaxWidth < measuredWidth) {
+            int measureMode = MeasureSpec.getMode(widthMeasureSpec);
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(mMaxWidth, measureMode);
+        }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 }

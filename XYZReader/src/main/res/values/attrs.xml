@@ -2,4 +2,12 @@
     <declare-styleable name="DrawInsetsFrameLayout">
         <attr name="insetBackground" format="color|reference" />
     </declare-styleable>
+
+
+    <declare-styleable name="MaxWidthLinearLayout">
+        <attr name="maxWidth" format="dimension" />
+    </declare-styleable>
+
+
 </resources>
+

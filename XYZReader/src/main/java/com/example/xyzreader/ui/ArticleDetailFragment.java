@@ -198,6 +198,7 @@ public class ArticleDetailFragment extends Fragment implements
                           Bundle savedInstanceState) {
         super.onInflate(context, attrs, savedInstanceState);
         mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(), attrs);
+        mMaxWidthContainer = new MaxWidthLinearLayout(getActivityCast(),attrs);
 
     }
 
@@ -240,7 +241,7 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+       mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
         mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
 
         mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
@@ -384,7 +385,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 if (bitmap != null) {
                                     Palette p = Palette.generate(bitmap, 12);
                                     mMutedColor = p.getDarkMutedColor(0xFF333333);
-                                    GlideApp.with(getActivity())
+                                   GlideApp.with(getActivity())
                                             .load(imageContainer.getBitmap())
                                             .centerCrop()
                                             .into(mPhotoView);
