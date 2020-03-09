@@ -1,31 +1,22 @@
 package com.example.xyzreader.ui;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
-import android.view.WindowInsets;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Future;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -40,48 +31,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
 import com.example.xyzreader.ui.components.ObservableScrollView;
-import com.google.gson.JsonObject;
-
-
 import android.support.annotation.NonNull;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Dispatcher;
-import okhttp3.OkHttpClient;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -125,6 +90,7 @@ public class ArticleDetailFragment extends Fragment implements
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
+
     public ArticleDetailFragment() {
     }
 
@@ -209,7 +175,19 @@ public class ArticleDetailFragment extends Fragment implements
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
         mRootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         setTransparentStatusBar();
-        mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
+
+        final Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+
+
+        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity.setSupportActionBar(toolbar);
+        activity.setTitle("Project Details");
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        CollapsingToolbarLayout collapsingToolbar =
+                (CollapsingToolbarLayout)mRootView.findViewById(R.id.collapsing_toolbar);
+
+        /**mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
@@ -226,11 +204,11 @@ public class ArticleDetailFragment extends Fragment implements
                 mTopInset = insets.top;
                 Log.d(TAG, "onInsetsChanged: " + mTopInset);
             }
-        });
+        });**/
 
         mStatusBarColorDrawable = new ColorDrawable(0);
 
-        linearcontainer = mRootView.findViewById(R.id.relativecontainer);
+        /**linearcontainer = mRootView.findViewById(R.id.relativecontainer);
         linearcontainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
             public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
@@ -239,12 +217,12 @@ public class ArticleDetailFragment extends Fragment implements
                 insets.consumeSystemWindowInsets();
                 return insets;
             }
-        });
+        });**/
 
-       mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
-        mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
+        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        //mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
 
-        mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
+        /**mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
         mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
             @Override
             public void onScrollChanged() {
@@ -254,7 +232,7 @@ public class ArticleDetailFragment extends Fragment implements
                 updateStatusBar();
 
             }
-        });
+        });**/
 
 
         /** mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
@@ -267,7 +245,7 @@ public class ArticleDetailFragment extends Fragment implements
         });**/
 
         bindViews();
-        updateStatusBar();
+        //updateStatusBar();
 
 
         return mRootView;
@@ -302,6 +280,9 @@ public class ArticleDetailFragment extends Fragment implements
             float f = progress(mScrollY,
                     mStatusBarFullOpacityBottom - mTopInset * 3,
                     mStatusBarFullOpacityBottom - mTopInset);
+
+            // * f !!
+
             mStatusBarColorDrawable.setColor(Color.argb(Color.alpha(mMutedColor),
                     (int) (Color.red(mMutedColor) * 0.9),
                     (int) (Color.green(mMutedColor) * 0.9),
@@ -385,7 +366,7 @@ public class ArticleDetailFragment extends Fragment implements
                                 if (bitmap != null) {
                                     Palette p = Palette.generate(bitmap, 12);
                                     mMutedColor = p.getDarkMutedColor(0xFF333333);
-                                   GlideApp.with(getActivity())
+                                    GlideApp.with(getActivity())
                                             .load(imageContainer.getBitmap())
                                             .centerCrop()
                                             .into(mPhotoView);
@@ -397,7 +378,7 @@ public class ArticleDetailFragment extends Fragment implements
                                    // Log.d(TAG, "onResponse: "+height);
                                    // params.setMargins(0,0,height,0);
 //
-                                  updateStatusBar();
+                                  //updateStatusBar();
                                 }
                             }
 
