@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -30,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import com.android.volley.VolleyError;
@@ -186,8 +188,9 @@ public class ArticleDetailFragment extends Fragment implements
 
         CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout)mRootView.findViewById(R.id.collapsing_toolbar);
-
-        /**mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
+        toolbar.setSubtitle("Test Subtitle");
+        toolbar.inflateMenu(R.menu.main);
+        mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
             @Override
@@ -204,36 +207,11 @@ public class ArticleDetailFragment extends Fragment implements
                 mTopInset = insets.top;
                 Log.d(TAG, "onInsetsChanged: " + mTopInset);
             }
-        });**/
+        });
+
 
         mStatusBarColorDrawable = new ColorDrawable(0);
-
-        /**linearcontainer = mRootView.findViewById(R.id.relativecontainer);
-        linearcontainer.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                int statusBar = insets.getSystemWindowInsetTop();
-                linearcontainer.setTranslationY(statusBar);
-                insets.consumeSystemWindowInsets();
-                return insets;
-            }
-        });**/
-
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
-        //mPhotoContainerView = mRootView.findViewById(R.id.photo_container);
-
-        /**mScrollView = (ObservableScrollView) mRootView.findViewById(R.id.scrollview);
-        mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
-            @Override
-            public void onScrollChanged() {
-                mScrollY = mScrollView.getScrollY();
-                getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
-                mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
-                updateStatusBar();
-
-            }
-        });**/
-
 
         /** mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View view) {
@@ -245,7 +223,7 @@ public class ArticleDetailFragment extends Fragment implements
         });**/
 
         bindViews();
-        //updateStatusBar();
+        updateStatusBar();
 
 
         return mRootView;
@@ -372,13 +350,7 @@ public class ArticleDetailFragment extends Fragment implements
                                             .into(mPhotoView);
                                         mRootView.findViewById(R.id.meta_bar)
                                            .setBackgroundColor(mMutedColor);
-
-                                        //FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) mMaxWidthContainer.getLayoutParams();
-                                   // int height=  mPhotoView.getMaxHeight();
-                                   // Log.d(TAG, "onResponse: "+height);
-                                   // params.setMargins(0,0,height,0);
-//
-                                  //updateStatusBar();
+                                        updateStatusBar();
                                 }
                             }
 
