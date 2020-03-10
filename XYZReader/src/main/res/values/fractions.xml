@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <fraction name="detail_title_spacing_multiplier">0.9</fraction>
+</resources>

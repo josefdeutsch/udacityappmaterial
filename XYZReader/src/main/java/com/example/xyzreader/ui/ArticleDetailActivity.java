@@ -4,6 +4,7 @@ import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
@@ -17,9 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.widget.Toast;
+
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
+
 /**
  * An activity representing a single Article detail screen, letting you swipe between articles.
  */
@@ -37,6 +40,8 @@ public class ArticleDetailActivity extends AppCompatActivity
     private MyPagerAdapter mPagerAdapter;
     private View mUpButtonContainer;
     private View mUpButton;
+
+    private int mCurrentPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +75,7 @@ public class ArticleDetailActivity extends AppCompatActivity
                 if (mCursor != null) {
                     mCursor.moveToPosition(position);
                 }
+                mCurrentPosition = position;
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
                 updateUpButtonPosition();
             }
@@ -104,15 +110,21 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mSelectedItemId = mStartId;
             }
         }
-       // Toolbar toolbar = findViewById(R.id.toolbar);
-       // setSupportActionBar(toolbar);
-       // getSupportActionBar().setDisplayShowTitleEnabled(false);
+        // Toolbar toolbar = findViewById(R.id.toolbar);
+        // setSupportActionBar(toolbar);
+        // getSupportActionBar().setDisplayShowTitleEnabled(false);
 
     }
+
     @Override
-    public void onResume(){
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
-        Toast.makeText(this,String.valueOf(mSelectedItemId),
+        Toast.makeText(this, String.valueOf(mSelectedItemId),
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -132,9 +144,8 @@ public class ArticleDetailActivity extends AppCompatActivity
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mCursor = cursor;
         mPagerAdapter.notifyDataSetChanged();
-
-        // Select the start ID
-        if (mStartId > 0) {
+         if (mStartId > 0) {
+            // Select the start ID
             mCursor.moveToFirst();
             // TODO: optimize
             while (!mCursor.isAfterLast()) {
@@ -169,8 +180,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        public MyPagerAdapter(android.support.v4.app.FragmentManager fm)
-        {
+        public MyPagerAdapter(android.support.v4.app.FragmentManager fm) {
             super(fm);
         }
 
@@ -187,7 +197,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             mCursor.moveToPosition(position);
-            return  ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
         }
 
         @Override

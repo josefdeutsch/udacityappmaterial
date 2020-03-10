@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -78,6 +79,9 @@ public class ArticleDetailFragment extends Fragment implements
     private boolean mIsCard = false;
     private int mStatusBarFullOpacityBottom;
     private View mMaxWidthContainer;
+    private AppCompatActivity activity;
+
+
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
@@ -181,14 +185,34 @@ public class ArticleDetailFragment extends Fragment implements
         final Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
 
 
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
+        activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
-        activity.setTitle("Project Details");
-        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-        CollapsingToolbarLayout collapsingToolbar =
+        AppBarLayout appBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar);
+        final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout)mRootView.findViewById(R.id.collapsing_toolbar);
-        toolbar.setSubtitle("Test Subtitle");
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            boolean isShow = false;
+            int scrollRange = -1;
+
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if (scrollRange == -1) {
+                    scrollRange = appBarLayout.getTotalScrollRange();
+                }
+                if (scrollRange + verticalOffset == 0) {
+                    collapsingToolbar.setTitle("          xyz Reader");
+                    isShow = true;
+                } else if (isShow) {
+                    collapsingToolbar.setTitle("");
+                    isShow = false;
+                }
+            }
+        });
+
+        toolbar.setTitle(null);
+
         toolbar.inflateMenu(R.menu.main);
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
@@ -314,6 +338,7 @@ public class ArticleDetailFragment extends Fragment implements
                 mRootView.setVisibility(View.VISIBLE);
                 mRootView.animate().alpha(1);
                 titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+
                  Date publishedDate = parsePublishedDate();
                  if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                  bylineView.setText(Html.fromHtml(
@@ -350,7 +375,8 @@ public class ArticleDetailFragment extends Fragment implements
                                             .into(mPhotoView);
                                         mRootView.findViewById(R.id.meta_bar)
                                            .setBackgroundColor(mMutedColor);
-                                        updateStatusBar();
+                                    updateStatusBar();
+
                                 }
                             }
 
