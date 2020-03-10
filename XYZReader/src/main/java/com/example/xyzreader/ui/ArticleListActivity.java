@@ -8,6 +8,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -23,6 +26,7 @@ import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.data.UpdaterService;
 import com.example.xyzreader.ui.components.DynamicHeightNetworkImageView;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
+import com.example.xyzreader.ui.components.RecyclerViewDividerGrid;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -134,6 +138,9 @@ public class ArticleListActivity extends AppCompatActivity {
                         StaggeredGridLayoutManager sglm =
                                 new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
                         mRecyclerView.setLayoutManager(sglm);
+                        RecyclerViewDividerGrid gridItemDivider = new RecyclerViewDividerGrid(getApplicationContext());
+                        mRecyclerView.addItemDecoration(gridItemDivider);
+
                     }
 
                     @Override

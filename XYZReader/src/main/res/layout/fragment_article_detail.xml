@@ -29,7 +29,6 @@
                 android:background="?attr/colorPrimary"
                 android:fitsSystemWindows="true"
                 app:contentScrim="?attr/colorPrimary"
-
                 app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
                 <ImageView
@@ -127,7 +126,6 @@
         </android.support.v4.widget.NestedScrollView>
 
     </android.support.design.widget.CoordinatorLayout>
-
 
 </com.example.xyzreader.ui.components.DrawInsetsFrameLayout>
 

@@ -11,6 +11,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.DividerItemDecoration;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
@@ -237,6 +238,9 @@ public class ArticleDetailFragment extends Fragment implements
         mStatusBarColorDrawable = new ColorDrawable(0);
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
 
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(activity, DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(activity, R.drawable.padded_divider));
+
         /** mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
         @Override public void onClick(View view) {
         startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
@@ -325,11 +329,10 @@ public class ArticleDetailFragment extends Fragment implements
                 return;
             }
 
-               TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+             TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
              TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
              bylineView.setMovementMethod(new LinkMovementMethod());
              TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-
 
              bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
