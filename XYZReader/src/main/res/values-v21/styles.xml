@@ -2,13 +2,15 @@
 <resources>
 
 <style name="Theme.Bacon" parent="@style/Theme.AppCompat.Light.DarkActionBar">
-
+    <item name="colorPrimary">@color/theme_primary</item>
+    <item name="colorPrimaryDark">@color/theme_primary_dark</item>
+    <item name="colorAccent">@color/theme_accent</item>
 </style>
 
 <style name="Theme.Bacon.Detail">
-
-    <item name="android:statusBarColor">@android:color/holo_blue_dark</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
     <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+    <item name="android:windowTranslucentStatus">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
 </style>
