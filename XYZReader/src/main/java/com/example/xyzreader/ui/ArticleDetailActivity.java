@@ -1,10 +1,14 @@
 package com.example.xyzreader.ui;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.LoaderManager;
@@ -12,6 +16,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.View;
@@ -31,18 +36,18 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private Cursor mCursor;
     private long mStartId;
-
+    public static final String ARG_ITEM_ID = "item_id";
     private long mSelectedItemId;
     private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
     private int mTopInset;
-
+    private static final String TAG = "ArticleDetailActivity";
     private ViewPager mPager;
     private MyPagerAdapter mPagerAdapter;
     private View mUpButtonContainer;
     private View mUpButton;
 
     private int mCurrentPosition = 0;
-
+    public final String SHOW_SWIPE_MESSAGE = "show_swipe_message";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,13 +66,12 @@ public class ArticleDetailActivity extends AppCompatActivity
                 .applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics()));
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
-        mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+        mPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            private boolean snackShown = false;
+
             @Override
-            public void onPageScrollStateChanged(int state) {
-                super.onPageScrollStateChanged(state);
-                mUpButton.animate()
-                        .alpha((state == ViewPager.SCROLL_STATE_IDLE) ? 1f : 0f)
-                        .setDuration(300);
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
             }
 
             @Override
@@ -77,7 +81,43 @@ public class ArticleDetailActivity extends AppCompatActivity
                 }
                 mCurrentPosition = position;
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
-                updateUpButtonPosition();
+
+                mPager.setTag(ARG_ITEM_ID+mCursor.getLong(ArticleLoader.Query._ID));
+                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                editor.putBoolean(SHOW_SWIPE_MESSAGE, true);
+                editor.apply();
+
+                 if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(SHOW_SWIPE_MESSAGE, true)) {
+                    View vw = mPager.getRootView();
+                    if (vw != null) {
+                        vw = vw.findViewWithTag(ArticleDetailFragment.getArticleDetailTag(mCursor.getLong(ArticleLoader.Query._ID)));
+                        if (vw != null) {
+                            if (!snackShown) {
+                                @SuppressWarnings("ResourceType")
+                                Snackbar snack = Snackbar.make(vw, R.string.swipe_message, Snackbar.LENGTH_LONG).setDuration(3000);
+                                snack.setAction(R.string.dismiss, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                                        editor.putBoolean(SHOW_SWIPE_MESSAGE, false);
+                                        editor.apply();
+                                    }
+                                });
+                                snack.show();
+                            } else {
+                                editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                                editor.putBoolean(SHOW_SWIPE_MESSAGE, false);
+                                editor.apply();
+                            }
+                        }
+                    }
+                }
+            }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                mUpButton.animate()
+                        .alpha((state == ViewPager.SCROLL_STATE_IDLE) ? 1f : 0f)
+                        .setDuration(300);
             }
         });
 
@@ -110,10 +150,6 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mSelectedItemId = mStartId;
             }
         }
-        // Toolbar toolbar = findViewById(R.id.toolbar);
-        // setSupportActionBar(toolbar);
-        // getSupportActionBar().setDisplayShowTitleEnabled(false);
-
     }
 
     @Override
@@ -124,8 +160,6 @@ public class ArticleDetailActivity extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
-        Toast.makeText(this, String.valueOf(mSelectedItemId),
-                Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -142,6 +176,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+
         mCursor = cursor;
         mPagerAdapter.notifyDataSetChanged();
          if (mStartId > 0) {
@@ -197,7 +232,11 @@ public class ArticleDetailActivity extends AppCompatActivity
         @Override
         public Fragment getItem(int position) {
             mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID));
+            boolean bool = true;
+            if(position==1 || position==3)
+            { bool=false; }
+            Log.d(TAG, "getItem: "+position);
+            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID),true);
         }
 
         @Override

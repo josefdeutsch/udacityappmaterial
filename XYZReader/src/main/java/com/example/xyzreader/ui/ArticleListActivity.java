@@ -147,7 +147,7 @@ public class ArticleListActivity extends AppCompatActivity {
                     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
                         mRecyclerView.setAdapter(null);
                     }
-                });;
+                });
                 updateRefreshingUI();
             }
         }

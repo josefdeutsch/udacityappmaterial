@@ -17,10 +17,12 @@ import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -34,18 +36,22 @@ import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
 import com.example.xyzreader.ui.components.ObservableScrollView;
+
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
@@ -60,6 +66,7 @@ public class ArticleDetailFragment extends Fragment implements
     private static final String TAG = "ArticleDetailFragment";
 
     public static final String ARG_ITEM_ID = "item_id";
+    public static final String LAYOUT_DECISION = "layout_decision";
     private static final float PARALLAX_FACTOR = 1.25f;
 
     private Cursor mCursor;
@@ -78,7 +85,7 @@ public class ArticleDetailFragment extends Fragment implements
     private int mStatusBarFullOpacityBottom;
     private View mMaxWidthContainer;
     private AppCompatActivity activity;
-
+    private Boolean layoutdecision;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
@@ -94,9 +101,11 @@ public class ArticleDetailFragment extends Fragment implements
     public ArticleDetailFragment() {
     }
 
-    public static android.support.v4.app.Fragment newInstance(long itemId) {
+    public static android.support.v4.app.Fragment newInstance(long itemId, boolean layout) {
+
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
+        arguments.putBoolean(LAYOUT_DECISION, layout);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -109,6 +118,9 @@ public class ArticleDetailFragment extends Fragment implements
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
         }
+        if (getArguments().containsKey(LAYOUT_DECISION)) {
+            layoutdecision = getArguments().getBoolean(LAYOUT_DECISION);
+        }
         mIsCard = getResources().getBoolean(R.bool.detail_is_card);
         mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
                 R.dimen.detail_card_top_margin);
@@ -116,6 +128,9 @@ public class ArticleDetailFragment extends Fragment implements
         setHasOptionsMenu(true);
     }
 
+    public static String getArticleDetailTag(final long articleId) {
+        return ARG_ITEM_ID + articleId;
+    }
 
     private void setTransparentStatusBar() {
 
@@ -170,8 +185,11 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-
-        mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
+        if (layoutdecision) {
+            mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
+        } else {
+            mRootView = inflater.inflate(R.layout.fragment_article_detail2, container, false);
+        }
 
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
@@ -191,7 +209,6 @@ public class ArticleDetailFragment extends Fragment implements
                 @Override
                 public void onInsetsChanged(Rect insets) {
                     mTopInset = insets.top;
-                    Log.d(TAG, "onInsetsChanged: " + mTopInset);
                 }
             });
         }
@@ -260,8 +277,7 @@ public class ArticleDetailFragment extends Fragment implements
         }
         if (mDrawInsetsFrameLayout != null) {
             mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
-        }else{
-            Log.d(TAG, "updateStatusBar: dfdfdfdf");
+        } else {
             getActivity().getWindow().setStatusBarColor(mStatusBarColorDrawable.getColor());
         }
 

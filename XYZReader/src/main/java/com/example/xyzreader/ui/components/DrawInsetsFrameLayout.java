@@ -104,7 +104,6 @@ public class DrawInsetsFrameLayout extends FrameLayout {
     @Override
     public WindowInsets onApplyWindowInsets(WindowInsets insets) {
         insets = super.onApplyWindowInsets(insets);
-        Log.d(TAG, "onApplyWindowInsets: ");
         mInsets = new Rect(
                 insets.getSystemWindowInsetLeft(),
                 insets.getSystemWindowInsetTop(),
@@ -125,7 +124,6 @@ public class DrawInsetsFrameLayout extends FrameLayout {
         int height = getHeight();
 
         if (mInsets != null) {
-            Log.d(TAG, "draw: ");
             // Top
             mTempRect.set(0, 0, width, mInsets.top);
             if (mInsetBackground != null) {
