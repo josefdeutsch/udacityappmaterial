@@ -178,22 +178,26 @@ public class ArticleDetailFragment extends Fragment implements
     public void onInflate(Context context, AttributeSet attrs,
                           Bundle savedInstanceState) {
         super.onInflate(context, attrs, savedInstanceState);
-        // mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(), attrs);
+        mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(), attrs);
         mMaxWidthContainer = new MaxWidthLinearLayout(getActivityCast(), attrs);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
+
         if (layoutdecision) {
             mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
         } else {
             mRootView = inflater.inflate(R.layout.fragment_article_detail2, container, false);
         }
+        Log.d(TAG, "onCreateView: "+"hello");
 
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
+
         setTransparentStatusBar();
+
         if (mDrawInsetsFrameLayout != null) {
 
             mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
@@ -276,7 +280,7 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.blue(mMutedColor) * 0.9)));
         }
         if (mDrawInsetsFrameLayout != null) {
-            mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
+
         } else {
             getActivity().getWindow().setStatusBarColor(mStatusBarColorDrawable.getColor());
         }
@@ -316,17 +320,26 @@ public class ArticleDetailFragment extends Fragment implements
 
         TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
-        bylineView.setMovementMethod(new LinkMovementMethod());
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
 
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+        bylineView.setMovementMethod(new LinkMovementMethod());
 
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
 
+                /**authorView.setText(Html.fromHtml(
+ //                    DateUtils.getRelativeTimeSpanString(
+ //                            mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
+ //                            System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+ //                            DateUtils.FORMAT_ABBREV_ALL).toString()
+ //                            + " by <font color='#ffffff'>"
+ //                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
+ //                            + "</font>"));**/
+
+            /** titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
                 bylineView.setText(Html.fromHtml(
@@ -345,8 +358,8 @@ public class ArticleDetailFragment extends Fragment implements
                                 + mCursor.getString(ArticleLoader.Query.AUTHOR)
                                 + "</font>"));
 
-            }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            }**/
+           // bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
@@ -355,16 +368,17 @@ public class ArticleDetailFragment extends Fragment implements
                             Bitmap bitmap = imageContainer.getBitmap();
 
                             if (bitmap != null) {
-                                Palette p = Palette.generate(bitmap, 12);
-                                mMutedColor = p.getDarkMutedColor(0xFF333333);
+                               Palette p = Palette.generate(bitmap, 12);
+                               mMutedColor = p.getDarkMutedColor(0xFF333333);
+
                                 GlideApp.with(getActivity())
                                         .load(imageContainer.getBitmap())
                                         .centerCrop()
                                         .into(mPhotoView);
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-                                updateStatusBar();
-
+                                mDrawInsetsFrameLayout.setInsetBackground(new ColorDrawable(Color.RED));
+                               //updateStatusBar();
                             }
                         }
 
