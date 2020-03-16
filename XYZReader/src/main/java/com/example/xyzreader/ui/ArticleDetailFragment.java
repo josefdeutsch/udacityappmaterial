@@ -8,12 +8,17 @@ import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.text.Editable;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
@@ -32,6 +37,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
@@ -54,6 +60,7 @@ import com.example.xyzreader.ui.components.ObservableScrollView;
 
 import android.support.annotation.NonNull;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -191,7 +198,7 @@ public class ArticleDetailFragment extends Fragment implements
         } else {
             mRootView = inflater.inflate(R.layout.fragment_article_detail2, container, false);
         }
-        Log.d(TAG, "onCreateView: "+"hello");
+        Log.d(TAG, "onCreateView: " + "hello");
 
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
@@ -248,7 +255,6 @@ public class ArticleDetailFragment extends Fragment implements
         toolbar.setTitle(null);
         toolbar.inflateMenu(R.menu.main);
 
-
         mStatusBarColorDrawable = new ColorDrawable(0);
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
 
@@ -262,11 +268,29 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
+        final NestedScrollView scrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollview);
+        if (scrollView != null) {
+            scrollView.getViewTreeObserver()
+                    .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                        @Override
+                        public void onScrollChanged() {
+                            if (scrollView.getChildAt(0).getBottom()
+                                    <= (scrollView.getHeight() + scrollView.getScrollY())) {
+                                Log.d(TAG, "onScrollChanged: bottom");
+                            } else {
+                                Log.d(TAG, "onScrollChanged: ");
+                            }
+                        }
+                    });
+        }
+
+
         bindViews();
         updateStatusBar();
         mRootView.invalidate();
         return mRootView;
     }
+
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -286,7 +310,7 @@ public class ArticleDetailFragment extends Fragment implements
                     (int) (Color.blue(mMutedColor) * 0.9)));
         }
         if (mDrawInsetsFrameLayout != null) {
-
+            mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
         } else {
             getActivity().getWindow().setStatusBarColor(mStatusBarColorDrawable.getColor());
         }
@@ -324,48 +348,82 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+
         TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-
         bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-        bylineView.setMovementMethod(new LinkMovementMethod());
 
+        /**     TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+
+         bylineView.setMovementMethod(new LinkMovementMethod());
+         **/
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
 
-                /**authorView.setText(Html.fromHtml(
- //                    DateUtils.getRelativeTimeSpanString(
- //                            mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
- //                            System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
- //                            DateUtils.FORMAT_ABBREV_ALL).toString()
- //                            + " by <font color='#ffffff'>"
- //                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
- //                            + "</font>"));**/
+            /**authorView.setText(Html.fromHtml(
+             //                    DateUtils.getRelativeTimeSpanString(
+             //                            mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
+             //                            System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+             //                            DateUtils.FORMAT_ABBREV_ALL).toString()
+             //                            + " by <font color='#ffffff'>"
+             //                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
+             //                            + "</font>"));**/
 
-            /** titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            Date publishedDate = parsePublishedDate();
-            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-                bylineView.setText(Html.fromHtml(
-                        DateUtils.getRelativeTimeSpanString(
-                                publishedDate.getTime(),
-                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                                DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
+            /**    titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+             Date publishedDate = parsePublishedDate();
+             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
+             bylineView.setText(Html.fromHtml(
+             DateUtils.getRelativeTimeSpanString(
+             publishedDate.getTime(),
+             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+             DateUtils.FORMAT_ABBREV_ALL).toString()
+             + " by <font color='#ffffff'>"
+             + mCursor.getString(ArticleLoader.Query.AUTHOR)
+             + "</font>"));
 
-            } else {
-                // If date is before 1902, just show the string
-                bylineView.setText(Html.fromHtml(
-                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
+             } else {
+             // If date is before 1902, just show the string
+             bylineView.setText(Html.fromHtml(
+             outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
+             + mCursor.getString(ArticleLoader.Query.AUTHOR)
+             + "</font>"));
 
-            }**/
-           // bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+             }**/
+
+            /**  new AsyncTask<Void, Void, Void>() {
+            @Override protected Void doInBackground(Void... voids) {
+            String str = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
+            String[] parts = str.split("\n");
+            parts.
+            return null;
+            }
+            }.execute();**/
+
+            String strArray = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("[\\s|\\u00A0]+", " ")).toString();
+
+
+           // String another = strArray.replaceAll("[\\s|\\u00A0]+", "");
+          //  removeExcessBlankLines(another);
+            //String newString = strArray.replace("\n ", "\n");
+            bodyView.setText(strArray);
+            /**
+             bodyView.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override public void afterTextChanged(Editable s) {
+
+            }
+            });
+             **/
+
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
@@ -374,8 +432,10 @@ public class ArticleDetailFragment extends Fragment implements
                             Bitmap bitmap = imageContainer.getBitmap();
 
                             if (bitmap != null) {
-                               Palette p = Palette.generate(bitmap, 12);
-                               mMutedColor = p.getDarkMutedColor(0xFF333333);
+
+                                // Background Thread...
+                                Palette p = Palette.generate(bitmap, 12);
+                                mMutedColor = p.getDarkMutedColor(0xFF333333);
 
                                 GlideApp.with(getActivity())
                                         .load(imageContainer.getBitmap())
@@ -383,8 +443,10 @@ public class ArticleDetailFragment extends Fragment implements
                                         .into(mPhotoView);
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-                                mDrawInsetsFrameLayout.setInsetBackground(new ColorDrawable(Color.RED));
-                               //updateStatusBar();
+
+
+                                //  mDrawInsetsFrameLayout.setInsetBackground(new ColorDrawable(Color.RED));
+                                updateStatusBar();
                             }
                         }
 
@@ -395,9 +457,9 @@ public class ArticleDetailFragment extends Fragment implements
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            titleView.setText("N/A");
-            bylineView.setText("N/A");
-            bodyView.setText("N/A");
+            //   titleView.setText("N/A");
+            //   bylineView.setText("N/A");
+            //   bodyView.setText("N/A");
         }
     }
 
@@ -441,5 +503,39 @@ public class ArticleDetailFragment extends Fragment implements
         return mIsCard
                 ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
                 : mPhotoView.getHeight() - mScrollY;
+    }
+
+    public static CharSequence removeExcessBlankLines(CharSequence source) {
+
+        if (source == null)
+            return "";
+        int newlineStart = -1;
+        int nbspStart = -1;
+        int consecutiveNewlines = 0;
+        SpannableStringBuilder ssb = new SpannableStringBuilder(source);
+        for (int i = 0; i < ssb.length(); ++i) {
+            final char c = ssb.charAt(i);
+            if (c == '\n') {
+                if (consecutiveNewlines == 0)
+                    newlineStart = i;
+
+                ++consecutiveNewlines;
+                nbspStart = -1;
+            } else if (c == '\u00A0') {
+                if (nbspStart == -1)
+                    nbspStart = i;
+            } else if (consecutiveNewlines > 0) {
+                if (!Character.isWhitespace(c) && c != '\u00A0') {
+                    if (consecutiveNewlines > 2) {
+                        ssb.replace(newlineStart, nbspStart > newlineStart ? nbspStart : i, "\n\n");
+                        i -= i - newlineStart;
+                    }
+                    consecutiveNewlines = 0;
+                    nbspStart = -1;
+                }
+            }
+        }
+
+        return ssb;
     }
 }

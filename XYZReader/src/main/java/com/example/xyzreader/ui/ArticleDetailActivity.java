@@ -56,7 +56,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     private ViewPager mPager;
     //private MyPagerAdapter mPagerAdapter;
     private MyPagerAdapter2 mPagerAdapter;
-  //  private CursorFragmentPagerAdapter mPagerAdapter;
+    //  private CursorFragmentPagerAdapter mPagerAdapter;
     // private FragmentPager mPagerAdapter;
     private View mUpButtonContainer;
     private View mUpButton;
@@ -75,8 +75,8 @@ public class ArticleDetailActivity extends AppCompatActivity
         setContentView(R.layout.activity_article_detail);
 
         getSupportLoaderManager().initLoader(0, null, this);
-       // mPagerAdapter = new CursorPagerAdapter(getApplicationContext(), getSupportFragmentManager(), mCursor);
-         mPagerAdapter = new MyPagerAdapter2(getSupportFragmentManager());
+        // mPagerAdapter = new CursorPagerAdapter(getApplicationContext(), getSupportFragmentManager(), mCursor);
+        mPagerAdapter = new MyPagerAdapter2(getSupportFragmentManager());
         //  mPagerAdapter = new FragmentPager(getSupportFragmentManager());
         mPager = (ViewPager) findViewById(R.id.pager);
         mPager.setOffscreenPageLimit(1);
@@ -99,38 +99,39 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mCursor.moveToPosition(position);
 
                 mPagerAdapter.notifyDataSetChanged();
-                /**
-                 mCurrentPosition = position;
-                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
 
-                 mPager.setTag(ARG_ITEM_ID+mCursor.getLong(ArticleLoader.Query._ID));
-                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                 editor.putBoolean(SHOW_SWIPE_MESSAGE, true);
-                 editor.apply();
+                mCurrentPosition = position;
+                mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
 
-                 if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(SHOW_SWIPE_MESSAGE, true)) {
-                 View vw = mPager.getRootView();
-                 if (vw != null) {
-                 vw = vw.findViewWithTag(ArticleDetailFragment.getArticleDetailTag(mCursor.getLong(ArticleLoader.Query._ID)));
-                 if (vw != null) {
-                 if (!snackShown) {
-                @SuppressWarnings("ResourceType") Snackbar snack = Snackbar.make(vw, R.string.swipe_message, Snackbar.LENGTH_LONG).setDuration(3000);
-                snack.setAction(R.string.dismiss, new View.OnClickListener() {
-                @Override public void onClick(View v) {
+                mPager.setTag(ARG_ITEM_ID + mCursor.getLong(ArticleLoader.Query._ID));
                 SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                editor.putBoolean(SHOW_SWIPE_MESSAGE, false);
+                editor.putBoolean(SHOW_SWIPE_MESSAGE, true);
                 editor.apply();
+
+                if (PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(SHOW_SWIPE_MESSAGE, true)) {
+                    View vw = mPager.getRootView();
+                    if (vw != null) {
+                        vw = vw.findViewWithTag(ArticleDetailFragment.getArticleDetailTag(mCursor.getLong(ArticleLoader.Query._ID)));
+                        if (vw != null) {
+                            if (!snackShown) {
+                                @SuppressWarnings("ResourceType") Snackbar snack = Snackbar.make(vw, R.string.swipe_message, Snackbar.LENGTH_LONG).setDuration(3000);
+                                snack.setAction(R.string.dismiss, new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                                        editor.putBoolean(SHOW_SWIPE_MESSAGE, false);
+                                        editor.apply();
+                                    }
+                                });
+                                snack.show();
+                            } else {
+                                editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
+                                editor.putBoolean(SHOW_SWIPE_MESSAGE, false);
+                                editor.apply();
+                            }
+                        }
+                    }
                 }
-                });
-                snack.show();
-                } else {
-                 editor = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit();
-                 editor.putBoolean(SHOW_SWIPE_MESSAGE, false);
-                 editor.apply();
-                 }
-                 }
-                 }
-                 }**/
             }
 
             @Override
@@ -183,7 +184,7 @@ public class ArticleDetailActivity extends AppCompatActivity
                         }
 
                         boolean consumed = false;
-                        for (int i = 0, count = mPager.getChildCount(); i <  count; i++) {
+                        for (int i = 0, count = mPager.getChildCount(); i < count; i++) {
                             ViewCompat.dispatchApplyWindowInsets(mPager.getChildAt(i), insets);
                             if (insets.isConsumed()) {
                                 consumed = true;
@@ -319,6 +320,7 @@ public class ArticleDetailActivity extends AppCompatActivity
                 updateUpButtonPosition();
             }
         }
+
         public void swapCursor(Cursor cursor) {
             mCursor = cursor;
             notifyDataSetChanged();
