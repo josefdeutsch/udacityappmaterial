@@ -264,7 +264,13 @@ public class ArticleDetailFragment extends Fragment implements
 
         bindViews();
         updateStatusBar();
+        mRootView.invalidate();
         return mRootView;
+    }
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mRootView.requestApplyInsets();
     }
 
     private void updateStatusBar() {
