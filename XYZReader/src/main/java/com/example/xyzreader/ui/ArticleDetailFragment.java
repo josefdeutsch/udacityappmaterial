@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.text.Editable;
 import android.text.Html;
+import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
@@ -27,6 +29,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -61,6 +66,8 @@ import com.example.xyzreader.ui.components.ObservableScrollView;
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static android.support.v4.util.Preconditions.checkNotNull;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -349,8 +356,8 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
 
-        TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-        bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+      //  final TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+       // bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
 
         /**     TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
          TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
@@ -392,22 +399,15 @@ public class ArticleDetailFragment extends Fragment implements
 
              }**/
 
-            /**  new AsyncTask<Void, Void, Void>() {
-            @Override protected Void doInBackground(Void... voids) {
-            String str = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
-            String[] parts = str.split("\n");
-            parts.
-            return null;
-            }
-            }.execute();**/
+            new AsyncSupplierTextView().execute();
 
-            String strArray = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("[\\s|\\u00A0]+", " ")).toString();
 
+            //w
 
            // String another = strArray.replaceAll("[\\s|\\u00A0]+", "");
           //  removeExcessBlankLines(another);
             //String newString = strArray.replace("\n ", "\n");
-            bodyView.setText(strArray);
+
             /**
              bodyView.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -537,5 +537,70 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
         return ssb;
+    }
+//    final TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+    private class AsyncSupplierTextView extends AsyncTask<Void, Void, String> {
+
+
+
+        @Override
+        protected String doInBackground(Void... strings) {
+          //  String strArray = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("[\s|\u00A0]+", " ")).toString();
+            //
+
+            // String message = mCursor.getString(ArticleLoader.Query.BODY);
+           // message = message.replace("\r\n","<br />");
+           // message = message.replace(" ","&nbsp;");
+           // message = Html.fromHtml(message).toString();
+           // String strArray = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)).toString();
+           // String strArray = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("[\\s|\\u00A0]+", "<br />")).toString();
+        //    String str = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
+            return null;
+        }
+        @Override
+        protected void onPostExecute(String strArray) {
+            super.onPostExecute(strArray);
+            String str = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
+            str = str.replaceAll("\\s+", " ");
+            Pattern pattern = Pattern.compile("([A-Z] [^\\.?]*[\\.!?])");
+            Matcher matcher = pattern.matcher(str);
+
+            for(int i=1; matcher.find();i++){
+                Log.d(TAG, "onPostExecute: "+i+matcher.group());
+            }
+
+       /**     StringTokenizer tokenizer = new StringTokenizer(str, ":.!?");
+
+            // spanned = trimSpannable(spanned);
+            bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+            // str.replaceAll("^ +| +$|( )+", " ").trim();
+            // str = str.replaceAll("\\s+", " ");
+
+            String string = tokenizer.nextToken();
+        //    string = string.replaceAll("\\s+", " ").trim();
+            bodyView.setText(string);**/
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private SpannableStringBuilder trimSpannable(SpannableStringBuilder spannable) {
+        Log.d(TAG, "trimSpannable: dfsdfd");
+        checkNotNull(spannable);
+        int trimStart = 0;
+        int trimEnd = 0;
+
+        String text = spannable.toString();
+
+        while (text.length() > 0 && text.startsWith("\n")) {
+            text = text.substring(1);
+            trimStart += 1;
+        }
+
+        while (text.length() > 0 && text.endsWith("\n")) {
+            text = text.substring(0, text.length() - 1);
+            trimEnd += 1;
+        }
+
+        return spannable.delete(0, trimStart).delete(spannable.length() - trimEnd, spannable.length());
     }
 }
