@@ -275,21 +275,7 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-        final NestedScrollView scrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollview);
-        if (scrollView != null) {
-            scrollView.getViewTreeObserver()
-                    .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                        @Override
-                        public void onScrollChanged() {
-                            if (scrollView.getChildAt(0).getBottom()
-                                    <= (scrollView.getHeight() + scrollView.getScrollY())) {
-                                Log.d(TAG, "onScrollChanged: bottom");
-                            } else {
-                                Log.d(TAG, "onScrollChanged: ");
-                            }
-                        }
-                    });
-        }
+
 
 
         bindViews();
@@ -355,18 +341,11 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-        //   bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-
-        //     String string = tokenizer.nextToken();
-        //   bodyView.setText(string);**/
-        //  final TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-        // bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-
-        /**     TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+         TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
          TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
 
          bylineView.setMovementMethod(new LinkMovementMethod());
-         **/
+
         if (mCursor != null) {
             mRootView.setAlpha(0);
             mRootView.setVisibility(View.VISIBLE);
@@ -381,7 +360,7 @@ public class ArticleDetailFragment extends Fragment implements
              //                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
              //                            + "</font>"));**/
 
-            /**    titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+                titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
              Date publishedDate = parsePublishedDate();
              if (!publishedDate.before(START_OF_EPOCH.getTime())) {
              bylineView.setText(Html.fromHtml(
@@ -400,32 +379,30 @@ public class ArticleDetailFragment extends Fragment implements
              + mCursor.getString(ArticleLoader.Query.AUTHOR)
              + "</font>"));
 
-             }**/
+             }
+            final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
+            final NestedScrollView scrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollview);
 
-            new AsyncSupplierTextView(50).execute();
+            if (scrollView != null) {
+                scrollView.getViewTreeObserver()
+                        .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
 
+                            Integer number = 40;
 
-            //w
+                            @Override
+                            public void onScrollChanged() {
+                                if (scrollView.getChildAt(0).getBottom()
+                                        <= (scrollView.getHeight() + scrollView.getScrollY())) {
+                                    new AsyncSupplierTextView(number,data).execute();
+                                    number += 20;
+                                } else {
 
-            // String another = strArray.replaceAll("[\\s|\\u00A0]+", "");
-            //  removeExcessBlankLines(another);
-            //String newString = strArray.replace("\n ", "\n");
-
-            /**
-             bodyView.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                                    Log.d(TAG, "onScrollChanged: ");
+                                }
+                            }
+                        });
             }
-
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override public void afterTextChanged(Editable s) {
-
-            }
-            });
-             **/
+            new AsyncSupplierTextView(20,data).execute();
 
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
@@ -460,8 +437,8 @@ public class ArticleDetailFragment extends Fragment implements
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            //   titleView.setText("N/A");
-            //   bylineView.setText("N/A");
+               titleView.setText("N/A");
+               bylineView.setText("N/A");
             //   bodyView.setText("N/A");
         }
     }
@@ -508,56 +485,24 @@ public class ArticleDetailFragment extends Fragment implements
                 : mPhotoView.getHeight() - mScrollY;
     }
 
-    public static CharSequence removeExcessBlankLines(CharSequence source) {
-
-        if (source == null)
-            return "";
-        int newlineStart = -1;
-        int nbspStart = -1;
-        int consecutiveNewlines = 0;
-        SpannableStringBuilder ssb = new SpannableStringBuilder(source);
-        for (int i = 0; i < ssb.length(); ++i) {
-            final char c = ssb.charAt(i);
-            if (c == '\n') {
-                if (consecutiveNewlines == 0)
-                    newlineStart = i;
-
-                ++consecutiveNewlines;
-                nbspStart = -1;
-            } else if (c == '\u00A0') {
-                if (nbspStart == -1)
-                    nbspStart = i;
-            } else if (consecutiveNewlines > 0) {
-                if (!Character.isWhitespace(c) && c != '\u00A0') {
-                    if (consecutiveNewlines > 2) {
-                        ssb.replace(newlineStart, nbspStart > newlineStart ? nbspStart : i, "\n\n");
-                        i -= i - newlineStart;
-                    }
-                    consecutiveNewlines = 0;
-                    nbspStart = -1;
-                }
-            }
-        }
-
-        return ssb;
-    }
-
 
     private class AsyncSupplierTextView extends AsyncTask<Void, Void, String> {
 
         Integer mNumber;
+        String mString;
 
-        public AsyncSupplierTextView(Integer number) {
+        public AsyncSupplierTextView(Integer number,String string) {
             mNumber = number;
+            mString = string;
         }
 
         @Override
         protected String doInBackground(Void... strings) {
-            
-            String str = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
-            str = str.replaceAll("\\s+", " ");
+
+
+            mString = mString.replaceAll("\\s+", " ");
             Pattern pattern = Pattern.compile("([A-Z] [^\\.?]*[\\.!?])");
-            Matcher matcher = pattern.matcher(str);
+            Matcher matcher = pattern.matcher(mString);
 
             String data = "";
 
