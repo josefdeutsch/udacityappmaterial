@@ -14,6 +14,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.text.Editable;
@@ -397,7 +398,6 @@ public class ArticleDetailFragment extends Fragment implements
                                     number += 20;
                                 } else {
 
-                                    Log.d(TAG, "onScrollChanged: ");
                                 }
                             }
                         });
@@ -423,9 +423,6 @@ public class ArticleDetailFragment extends Fragment implements
                                         .into(mPhotoView);
                                 mRootView.findViewById(R.id.meta_bar)
                                         .setBackgroundColor(mMutedColor);
-
-
-                                //  mDrawInsetsFrameLayout.setInsetBackground(new ColorDrawable(Color.RED));
                                 updateStatusBar();
                             }
                         }
@@ -490,10 +487,20 @@ public class ArticleDetailFragment extends Fragment implements
 
         Integer mNumber;
         String mString;
+        private AlertDialog mDialog;
 
         public AsyncSupplierTextView(Integer number,String string) {
             mNumber = number;
             mString = string;
+        }
+
+        @Override
+        protected void onPreExecute(){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setCancelable(false);
+            builder.setView(R.layout.progressdialog);
+            mDialog = builder.create();
+            mDialog.show();
         }
 
         @Override
@@ -523,6 +530,22 @@ public class ArticleDetailFragment extends Fragment implements
             TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
             bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
             bodyView.setText(matcher);
+            mDialog.hide();
         }
     }
+
+    private AlertDialog mDialog;
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        if(mDialog!=null) mDialog.hide();
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        if(mDialog!=null) mDialog.hide();
+    }
+
 }
