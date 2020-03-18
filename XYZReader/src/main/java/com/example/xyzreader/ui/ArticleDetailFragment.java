@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ShareCompat;
@@ -20,12 +21,15 @@ import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -40,18 +44,22 @@ import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
+
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
 import com.example.xyzreader.ui.components.ObservableScrollView;
+
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
@@ -264,7 +272,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         bindViews();
         updateStatusBar();
-     //   mRootView.invalidate();
+        //   mRootView.invalidate();
         return mRootView;
     }
 
@@ -294,6 +302,7 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
     }
+
     static float progress(float v, float min, float max) {
         return constrain((v - min) / (max - min), 0, 1);
     }
@@ -324,10 +333,10 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-         TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-         TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
+        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
 
-         bylineView.setMovementMethod(new LinkMovementMethod());
+        bylineView.setMovementMethod(new LinkMovementMethod());
 
         if (mCursor != null) {
             mRootView.setAlpha(0);
@@ -343,26 +352,26 @@ public class ArticleDetailFragment extends Fragment implements
              //                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
              //                            + "</font>"));**/
 
-                titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-             Date publishedDate = parsePublishedDate();
-             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-             bylineView.setText(Html.fromHtml(
-             DateUtils.getRelativeTimeSpanString(
-             publishedDate.getTime(),
-             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-             DateUtils.FORMAT_ABBREV_ALL).toString()
-             + " by <font color='#ffffff'>"
-             + mCursor.getString(ArticleLoader.Query.AUTHOR)
-             + "</font>"));
+            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+            Date publishedDate = parsePublishedDate();
+            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
+                bylineView.setText(Html.fromHtml(
+                        DateUtils.getRelativeTimeSpanString(
+                                publishedDate.getTime(),
+                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+                                DateUtils.FORMAT_ABBREV_ALL).toString()
+                                + " by <font color='#ffffff'>"
+                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                                + "</font>"));
 
-             } else {
-             // If date is before 1902, just show the string
-             bylineView.setText(Html.fromHtml(
-             outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
-             + mCursor.getString(ArticleLoader.Query.AUTHOR)
-             + "</font>"));
+            } else {
+                // If date is before 1902, just show the string
+                bylineView.setText(Html.fromHtml(
+                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
+                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                                + "</font>"));
 
-             }
+            }
 
             final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
             final NestedScrollView scrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollview);
@@ -370,20 +379,31 @@ public class ArticleDetailFragment extends Fragment implements
             if (scrollView != null) {
                 scrollView.getViewTreeObserver()
                         .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                            Integer number = 40;
+                            Integer number = 80;
+                            AsyncTask asyncTask;
+                            Stack<AsyncSupplierTextView> stack = new Stack<>();
+
                             @Override
                             public void onScrollChanged() {
                                 if (scrollView.getChildAt(0).getBottom()
                                         <= (scrollView.getHeight() + scrollView.getScrollY())) {
-                                    new AsyncSupplierTextView(number,data).execute();
-                                    number += 20;
+                                    if (!stack.empty()) {
+                                        for (AsyncSupplierTextView item : stack) {
+                                            item.cancel(true);
+                                            stack.pop();
+                                        }
+                                    }
+                                    AsyncSupplierTextView asyncTask = new AsyncSupplierTextView(number, data);
+                                    asyncTask.execute();
+                                    stack.push(asyncTask);
+                                    number += 40;
                                 } else {
 
                                 }
                             }
                         });
             }
-            new AsyncSupplierTextView(20,data).execute();
+            new AsyncSupplierTextView(40, data).execute();
 
 
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
@@ -415,8 +435,8 @@ public class ArticleDetailFragment extends Fragment implements
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-               titleView.setText("N/A");
-               bylineView.setText("N/A");
+            titleView.setText("N/A");
+            bylineView.setText("N/A");
             //   bodyView.setText("N/A");
         }
     }
@@ -468,19 +488,23 @@ public class ArticleDetailFragment extends Fragment implements
 
         Integer mNumber;
         String mString;
+        Handler mHandler = new Handler();
+        private AlertDialog mDialog;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-
-        public AsyncSupplierTextView(Integer number,String string) {
+        public AsyncSupplierTextView(Integer number, String string) {
             mNumber = number;
             mString = string;
+
+            builder.setCancelable(true);
+            builder.setView(R.layout.progressdialog);
+            mDialog = builder.create();
+
         }
 
         @Override
-        protected void onPreExecute(){
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setCancelable(false);
-            builder.setView(R.layout.progressdialog);
-            mDialog = builder.create();
+        protected void onPreExecute() {
+
             mDialog.show();
 
         }
@@ -490,9 +514,25 @@ public class ArticleDetailFragment extends Fragment implements
 
 
             mString = mString.replaceAll("\\s+", " ");
-            Pattern pattern = Pattern.compile("([A-Z] [^\\.?]*[\\.!?])");
-            Matcher matcher = pattern.matcher(mString);
 
+            final Pattern pattern = Pattern.compile("([A-Z] [^\\.?]*[\\.!?])");
+            final Matcher matcher = pattern.matcher(mString);
+            final String data = getString(matcher);
+
+            mHandler.post(new Runnable() {
+
+                @Override
+                public void run() {
+
+                     TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+                     bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+                     bodyView.setText(data);
+                }
+            });
+            return data;
+        }
+
+        private String getString(Matcher matcher) {
             String data = "";
 
             for (int i = 1; matcher.find(); i++) {
@@ -500,34 +540,18 @@ public class ArticleDetailFragment extends Fragment implements
                     break;
                 }
                 data += matcher.group() + "\n";
-              //  Log.d(TAG, "onPostExecute: " + i +" "+ matcher.group());
+                //  Log.d(TAG, "onPostExecute: " + i +" "+ matcher.group());
             }
-
             return data;
         }
 
         @Override
-        protected void onPostExecute(String matcher) {
-            super.onPostExecute(matcher);
-            TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-            bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-            bodyView.setText(matcher);
+        protected void onPostExecute(String data) {
+            super.onPostExecute(data);
+
             mDialog.hide();
+            mDialog.dismiss();
+            mDialog.cancel();
         }
     }
-
-    private AlertDialog mDialog;
-
-    @Override
-    public void onPause(){
-        super.onPause();
-        if(mDialog!=null) mDialog.hide();
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        if(mDialog!=null) mDialog.hide();
-    }
-
 }

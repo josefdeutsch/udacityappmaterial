@@ -94,7 +94,6 @@ public class ArticleDetailActivity extends AppCompatActivity
             @Override
             public void onPageSelected(int position) {
 
-
                 Log.d(TAG, "onPageSelected: " + position);
                 mCursor.moveToPosition(position);
 

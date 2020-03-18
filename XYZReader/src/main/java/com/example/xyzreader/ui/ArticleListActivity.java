@@ -112,12 +112,7 @@ public class ArticleListActivity extends AppCompatActivity {
         unregisterReceiver(mRefreshingReceiver);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        menu.clear();
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+
 
     private boolean mIsRefreshing = false;
 
@@ -153,8 +148,16 @@ public class ArticleListActivity extends AppCompatActivity {
             }
         }
     };
+
     private void updateRefreshingUI() {
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.clear();
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
     }
 
     @Override
