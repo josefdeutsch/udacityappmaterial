@@ -13,5 +13,6 @@
     <string name="defaultdescription">defaultdescription</string>
     <string name="dismiss">dismiss</string>
     <string name="swipe_message">message</string>
+    <string name="swipe_message2">please use swipe gesture</string>
 
 </resources>

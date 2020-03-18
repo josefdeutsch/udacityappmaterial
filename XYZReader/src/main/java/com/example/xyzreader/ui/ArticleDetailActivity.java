@@ -195,16 +195,6 @@ public class ArticleDetailActivity extends AppCompatActivity
                 });
     }
 
-    private void cleanFragments(FragmentManager childFragmentManager) {
-        List<Fragment> childFragments = childFragmentManager.getFragments();
-        if (childFragments != null && !childFragments.isEmpty()) {
-            FragmentTransaction ft = childFragmentManager.beginTransaction();
-            for (Fragment fragment : childFragments) {
-                ft.remove(fragment);
-            }
-            ft.commit();
-        }
-    }
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {

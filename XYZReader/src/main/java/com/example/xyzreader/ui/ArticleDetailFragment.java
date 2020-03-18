@@ -1,6 +1,5 @@
 package com.example.xyzreader.ui;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,23 +16,16 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
-import android.text.Editable;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -48,27 +40,20 @@ import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
-
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
 import com.example.xyzreader.ui.components.ObservableScrollView;
-
 import android.support.annotation.NonNull;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import static android.support.v4.util.Preconditions.checkNotNull;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -239,6 +224,7 @@ public class ArticleDetailFragment extends Fragment implements
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         AppBarLayout appBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar);
+
         final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -276,12 +262,9 @@ public class ArticleDetailFragment extends Fragment implements
             }
         });
 
-
-
-
         bindViews();
         updateStatusBar();
-        mRootView.invalidate();
+     //   mRootView.invalidate();
         return mRootView;
     }
 
@@ -298,6 +281,7 @@ public class ArticleDetailFragment extends Fragment implements
                     mStatusBarFullOpacityBottom - mTopInset * 3,
                     mStatusBarFullOpacityBottom - mTopInset);
             // * f !!
+
             mStatusBarColorDrawable.setColor(Color.argb(Color.alpha(mMutedColor),
                     (int) (Color.red(mMutedColor) * 0.9),
                     (int) (Color.green(mMutedColor) * 0.9),
@@ -310,8 +294,6 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
     }
-
-
     static float progress(float v, float min, float max) {
         return constrain((v - min) / (max - min), 0, 1);
     }
@@ -381,15 +363,14 @@ public class ArticleDetailFragment extends Fragment implements
              + "</font>"));
 
              }
+
             final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
             final NestedScrollView scrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollview);
 
             if (scrollView != null) {
                 scrollView.getViewTreeObserver()
                         .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-
                             Integer number = 40;
-
                             @Override
                             public void onScrollChanged() {
                                 if (scrollView.getChildAt(0).getBottom()
@@ -487,7 +468,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         Integer mNumber;
         String mString;
-        private AlertDialog mDialog;
+
 
         public AsyncSupplierTextView(Integer number,String string) {
             mNumber = number;
@@ -501,6 +482,7 @@ public class ArticleDetailFragment extends Fragment implements
             builder.setView(R.layout.progressdialog);
             mDialog = builder.create();
             mDialog.show();
+
         }
 
         @Override
@@ -518,7 +500,7 @@ public class ArticleDetailFragment extends Fragment implements
                     break;
                 }
                 data += matcher.group() + "\n";
-                Log.d(TAG, "onPostExecute: " + i +" "+ matcher.group());
+              //  Log.d(TAG, "onPostExecute: " + i +" "+ matcher.group());
             }
 
             return data;

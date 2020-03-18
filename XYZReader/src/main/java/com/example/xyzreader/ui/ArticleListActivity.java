@@ -4,17 +4,23 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -55,7 +61,7 @@ public class ArticleListActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mRecyclerView;
-
+    private View mRootView;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
     // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
@@ -66,8 +72,9 @@ public class ArticleListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mRootView = View.inflate(this, R.layout.activity_article_list, null);
+        setContentView(mRootView);
 
-        setContentView(R.layout.activity_article_list);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -83,9 +90,8 @@ public class ArticleListActivity extends AppCompatActivity {
             }
         });
 
-        if (savedInstanceState == null) {
-            refresh();
-        }
+        refresh();
+
     }
 
     private void refresh() {
@@ -119,16 +125,13 @@ public class ArticleListActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (UpdaterService.BROADCAST_ACTION_STATE_CHANGE.equals(intent.getAction())) {
-                Log.d(TAG, "onReceive: ");
                 mIsRefreshing = intent.getBooleanExtra(UpdaterService.EXTRA_REFRESHING, false);
-
                 getSupportLoaderManager().restartLoader(0, null, new LoaderManager.LoaderCallbacks<Cursor>() {
                     @NonNull
                     @Override
                     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
                         return ArticleLoader.newAllArticlesInstance(getApplicationContext());
                     }
-
                     @Override
                     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
                         mAdapter = new Adapter(data);
@@ -140,9 +143,7 @@ public class ArticleListActivity extends AppCompatActivity {
                         mRecyclerView.setLayoutManager(sglm);
                         RecyclerViewDividerGrid gridItemDivider = new RecyclerViewDividerGrid(getApplicationContext());
                         mRecyclerView.addItemDecoration(gridItemDivider);
-
                     }
-
                     @Override
                     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
                         mRecyclerView.setAdapter(null);
@@ -152,10 +153,20 @@ public class ArticleListActivity extends AppCompatActivity {
             }
         }
     };
-
     private void updateRefreshingUI() {
-
         mSwipeRefreshLayout.setRefreshing(mIsRefreshing);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        @SuppressWarnings("ResourceType") Snackbar snack = Snackbar.make(mRootView, R.string.swipe_message2, Snackbar.LENGTH_LONG).setDuration(3000);
+        snack.setAction(R.string.dismiss, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+        snack.show();
+        return super.onOptionsItemSelected(item);
     }
 
     private class Adapter extends RecyclerView.Adapter<ViewHolder> {
