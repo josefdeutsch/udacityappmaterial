@@ -14,5 +14,8 @@
     <string name="dismiss">dismiss</string>
     <string name="swipe_message">message</string>
     <string name="swipe_message2">please use swipe gesture</string>
+    <string name="swipe_layout_not_supported">SwipeLayout needs to be parent of Grid or ListView</string>
+    <string name="translation">translation</string>
+    <string name="windowinsets">windowinsets</string>
 
 </resources>

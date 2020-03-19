@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ShareCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
@@ -36,6 +37,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -157,7 +160,11 @@ public class ArticleDetailFragment extends Fragment implements
             window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparentSatusBar));
         }
     }
-
+    
+    @Override
+    public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
+      super.onCreateOptionsMenu(menu,inflater);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -166,10 +173,17 @@ public class ArticleDetailFragment extends Fragment implements
                     getActivity().finishAfterTransition();
                     return true;
                 }
+            case (R.id.refresh):
+                @SuppressWarnings("ResourceType") Snackbar snack = Snackbar.make(mRootView, R.string.swipe_layout_not_supported, Snackbar.LENGTH_LONG).setDuration(3000);
+                snack.setAction(R.string.dismiss, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    }
+                });
+                snack.show();
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     public ArticleDetailActivity getActivityCast() {
         return (ArticleDetailActivity) getActivity();
@@ -483,7 +497,6 @@ public class ArticleDetailFragment extends Fragment implements
                 : mPhotoView.getHeight() - mScrollY;
     }
 
-
     private class AsyncSupplierTextView extends AsyncTask<Void, Void, String> {
 
         Integer mNumber;
@@ -495,23 +508,18 @@ public class ArticleDetailFragment extends Fragment implements
         public AsyncSupplierTextView(Integer number, String string) {
             mNumber = number;
             mString = string;
-
             builder.setCancelable(true);
             builder.setView(R.layout.progressdialog);
             mDialog = builder.create();
-
         }
 
         @Override
         protected void onPreExecute() {
-
             mDialog.show();
-
         }
 
         @Override
         protected String doInBackground(Void... strings) {
-
 
             mString = mString.replaceAll("\\s+", " ");
 
@@ -520,10 +528,8 @@ public class ArticleDetailFragment extends Fragment implements
             final String data = getString(matcher);
 
             mHandler.post(new Runnable() {
-
                 @Override
                 public void run() {
-
                      TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
                      bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
                      bodyView.setText(data);

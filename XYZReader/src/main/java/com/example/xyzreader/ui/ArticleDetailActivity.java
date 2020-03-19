@@ -60,6 +60,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     // private FragmentPager mPagerAdapter;
     private View mUpButtonContainer;
     private View mUpButton;
+    private int mTranslation;
 
     private int mCurrentPosition = 0;
     public final String SHOW_SWIPE_MESSAGE = "show_swipe_message";
@@ -94,7 +95,6 @@ public class ArticleDetailActivity extends AppCompatActivity
             @Override
             public void onPageSelected(int position) {
 
-                Log.d(TAG, "onPageSelected: " + position);
                 mCursor.moveToPosition(position);
 
                 mPagerAdapter.notifyDataSetChanged();
@@ -170,7 +170,6 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mSelectedItemId = mStartId;
             }
         }
-        ViewPager mViewPager;
 
         ViewCompat.setOnApplyWindowInsetsListener(mPager,
                 new OnApplyWindowInsetsListener() {
@@ -192,17 +191,29 @@ public class ArticleDetailActivity extends AppCompatActivity
                         return consumed ? insets.consumeSystemWindowInsets() : insets;
                     }
                 });
+
     }
+
 
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putInt(getResources().getResourceName(R.string.translation), mTranslation);
+        outState.putInt(getResources().getResourceName(R.string.windowinsets),mTopInset);
+    }
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mTranslation = savedInstanceState.getInt(getResources().getResourceName(R.string.translation));
+        mTopInset = savedInstanceState.getInt(getResources().getResourceName(R.string.windowinsets));
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        mUpButtonContainer.setTranslationY(mTopInset);
+        updateUpButtonPosition();
     }
 
     @Override
@@ -260,8 +271,12 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private void updateUpButtonPosition() {
         int upButtonNormalBottom = mTopInset + mUpButton.getHeight();
-        mUpButton.setTranslationY(Math.min(mSelectedItemUpButtonFloor - upButtonNormalBottom, 0));
+        mTranslation = mSelectedItemUpButtonFloor - upButtonNormalBottom;
+        mUpButton.setTranslationY(Math.min(mTranslation,0));
+
     }
+
+    //2147483367
 
     private class MyPagerAdapter2 extends FragmentStatePagerAdapter {
 
