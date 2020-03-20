@@ -1,5 +1,6 @@
 package com.example.xyzreader.ui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -104,11 +105,6 @@ public class ArticleDetailFragment extends Fragment implements
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-
     public ArticleDetailFragment() {
     }
 
@@ -139,32 +135,35 @@ public class ArticleDetailFragment extends Fragment implements
         setHasOptionsMenu(true);
     }
 
-    public static String getArticleDetailTag(final long articleId) {
-        return ARG_ITEM_ID + articleId;
-    }
-
-    private void setTransparentStatusBar() {
-
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    private void setTransparentStatusBarLollipop() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getActivity().getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                getActivity().getWindow().getDecorView().setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-                                View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            } else {
-                getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
-            }
+            setTransparentStatusBarMarshmallow();
+
             window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparentSatusBar));
         }
     }
-    
+
+    @TargetApi(Build.VERSION_CODES.M)
+    private void setTransparentStatusBarMarshmallow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getActivity().getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        } else {
+            getActivity().getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
-      super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -207,34 +206,19 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
-
-        if (layoutdecision) {
-            mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
-        } else {
-            mRootView = inflater.inflate(R.layout.fragment_article_detail2, container, false);
-        }
-        Log.d(TAG, "onCreateView: " + "hello");
+        mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
 
-        setTransparentStatusBar();
+        setTransparentStatusBarLollipop();
 
         if (mDrawInsetsFrameLayout != null) {
-
-            mRootView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
-                @Override
-                public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
-                    insets = mDrawInsetsFrameLayout.onApplyWindowInsets(insets);
-                    insets.consumeSystemWindowInsets();
-                    return insets;
-                }
-            });
-
             mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
                 @Override
                 public void onInsetsChanged(Rect insets) {
                     mTopInset = insets.top;
+                    Log.d(TAG, "onInsetsChanged: " + mTopInset);
                 }
             });
         }
@@ -249,6 +233,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         final CollapsingToolbarLayout collapsingToolbar =
                 (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
             int scrollRange = -1;
@@ -285,8 +270,7 @@ public class ArticleDetailFragment extends Fragment implements
         });
 
         bindViews();
-        updateStatusBar();
-        //   mRootView.invalidate();
+        //updateStatusBar();
         return mRootView;
     }
 
@@ -298,23 +282,13 @@ public class ArticleDetailFragment extends Fragment implements
 
     private void updateStatusBar() {
 
-        if (mPhotoView != null) {
-            float f = progress(mScrollY,
-                    mStatusBarFullOpacityBottom - mTopInset * 3,
-                    mStatusBarFullOpacityBottom - mTopInset);
-            // * f !!
-
+        if (mDrawInsetsFrameLayout != null) {
             mStatusBarColorDrawable.setColor(Color.argb(Color.alpha(mMutedColor),
                     (int) (Color.red(mMutedColor) * 0.9),
                     (int) (Color.green(mMutedColor) * 0.9),
                     (int) (Color.blue(mMutedColor) * 0.9)));
-        }
-        if (mDrawInsetsFrameLayout != null) {
             mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
-        } else {
-            getActivity().getWindow().setStatusBarColor(mStatusBarColorDrawable.getColor());
         }
-
     }
 
     static float progress(float v, float min, float max) {
@@ -357,15 +331,6 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setVisibility(View.VISIBLE);
             mRootView.animate().alpha(1);
 
-            /**authorView.setText(Html.fromHtml(
-             //                    DateUtils.getRelativeTimeSpanString(
-             //                            mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
-             //                            System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-             //                            DateUtils.FORMAT_ABBREV_ALL).toString()
-             //                            + " by <font color='#ffffff'>"
-             //                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
-             //                            + "</font>"));**/
-
             titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
             Date publishedDate = parsePublishedDate();
             if (!publishedDate.before(START_OF_EPOCH.getTime())) {
@@ -379,7 +344,6 @@ public class ArticleDetailFragment extends Fragment implements
                                 + "</font>"));
 
             } else {
-                // If date is before 1902, just show the string
                 bylineView.setText(Html.fromHtml(
                         outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
                                 + mCursor.getString(ArticleLoader.Query.AUTHOR)
@@ -497,6 +461,10 @@ public class ArticleDetailFragment extends Fragment implements
                 : mPhotoView.getHeight() - mScrollY;
     }
 
+    public static String getArticleDetailTag(final long articleId) {
+        return ARG_ITEM_ID + articleId;
+    }
+
     private class AsyncSupplierTextView extends AsyncTask<Void, Void, String> {
 
         Integer mNumber;
@@ -530,9 +498,9 @@ public class ArticleDetailFragment extends Fragment implements
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                     TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
-                     bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
-                     bodyView.setText(data);
+                    TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+                    bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+                    bodyView.setText(data);
                 }
             });
             return data;
@@ -546,7 +514,6 @@ public class ArticleDetailFragment extends Fragment implements
                     break;
                 }
                 data += matcher.group() + "\n";
-                //  Log.d(TAG, "onPostExecute: " + i +" "+ matcher.group());
             }
             return data;
         }

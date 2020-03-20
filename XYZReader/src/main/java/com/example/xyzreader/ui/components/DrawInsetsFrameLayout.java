@@ -22,6 +22,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.WindowInsets;
@@ -43,6 +44,7 @@ public class DrawInsetsFrameLayout extends FrameLayout {
     public DrawInsetsFrameLayout(Context context) {
         super(context);
         init(context, null, 0);
+
     }
 
     public DrawInsetsFrameLayout(Context context, AttributeSet attrs) {
