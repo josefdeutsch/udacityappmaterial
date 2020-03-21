@@ -48,6 +48,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 
+import static com.example.xyzreader.remote.Config.HTMLNEWLINE;
+import static com.example.xyzreader.remote.Config.RESOURCETYPE;
+import static com.example.xyzreader.remote.Config.STAGGEREDGRIDCOLUMNCOUNT;
+
 /**
  * An activity representing a list of Articles. This activity has different presentations for
  * handset and tablet-size devices. On handsets, the activity presents a list of items, which when
@@ -75,14 +79,14 @@ public class ArticleListActivity extends AppCompatActivity {
         mRootView = View.inflate(this, R.layout.activity_article_list, null);
         setContentView(mRootView);
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        mRecyclerView = findViewById(R.id.recycler_view);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setLogo(R.drawable.logo);
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -132,7 +136,7 @@ public class ArticleListActivity extends AppCompatActivity {
                         mAdapter = new Adapter(data);
                         mAdapter.setHasStableIds(true);
                         mRecyclerView.setAdapter(mAdapter);
-                        int columnCount = getResources().getInteger(R.integer.list_column_count);
+                        int columnCount = STAGGEREDGRIDCOLUMNCOUNT;
                         StaggeredGridLayoutManager sglm =
                                 new StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL);
                         mRecyclerView.setLayoutManager(sglm);
@@ -162,7 +166,7 @@ public class ArticleListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        @SuppressWarnings("ResourceType") Snackbar snack = Snackbar.make(mRootView, R.string.swipe_message2, Snackbar.LENGTH_LONG).setDuration(3000);
+        @SuppressWarnings(RESOURCETYPE) Snackbar snack = Snackbar.make(mRootView, R.string.swipe_message2, Snackbar.LENGTH_LONG).setDuration(3000);
         snack.setAction(R.string.dismiss, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -205,7 +209,6 @@ public class ArticleListActivity extends AppCompatActivity {
                 return dateFormat.parse(date);
             } catch (ParseException ex) {
                 Log.e(TAG, ex.getMessage());
-                Log.i(TAG, "passing today's date");
                 return new Date();
             }
         }
@@ -222,12 +225,12 @@ public class ArticleListActivity extends AppCompatActivity {
                                 publishedDate.getTime(),
                                 System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + "<br/>" + " by "
+                                + HTMLNEWLINE + " by "
                                 + mCursor.getString(ArticleLoader.Query.AUTHOR)));
             } else {
                 holder.subtitleView.setText(Html.fromHtml(
                         outputFormat.format(publishedDate)
-                        + "<br/>" + " by "
+                        + HTMLNEWLINE + " by "
                         + mCursor.getString(ArticleLoader.Query.AUTHOR)));
             }
 
@@ -253,9 +256,9 @@ public class ArticleListActivity extends AppCompatActivity {
 
         public ViewHolder(View view) {
             super(view);
-            thumbnailView = (DynamicHeightNetworkImageView) view.findViewById(R.id.thumbnail);
-            titleView = (TextView) view.findViewById(R.id.article_title);
-            subtitleView = (TextView) view.findViewById(R.id.article_subtitle);
+            thumbnailView = view.findViewById(R.id.thumbnail);
+            titleView = view.findViewById(R.id.article_title);
+            subtitleView = view.findViewById(R.id.article_subtitle);
         }
     }
 }

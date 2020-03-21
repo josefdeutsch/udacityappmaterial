@@ -45,10 +45,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
-import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.widget.ImageView;
-
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
@@ -57,52 +55,48 @@ import com.example.xyzreader.data.ArticleLoader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
 import com.example.xyzreader.ui.components.MaxWidthLinearLayout;
-import com.example.xyzreader.ui.components.ObservableScrollView;
-
 import android.support.annotation.NonNull;
 import android.widget.TextView;
 
-/**
- * A fragment representing a single Article detail screen. This fragment is
- * either contained in a {@link ArticleListActivity} in two-pane mode (on
- * tablets) or a {@link ArticleDetailActivity} on handsets.
- */
+import static com.example.xyzreader.remote.Config.ARG_ITEM_ID;
+import static com.example.xyzreader.remote.Config.BLANKSPACE;
+import static com.example.xyzreader.remote.Config.BYFONTCOLOUR;
+import static com.example.xyzreader.remote.Config.CLEARWHITESPACEFULL;
+import static com.example.xyzreader.remote.Config.EMPTYNONNULL;
+import static com.example.xyzreader.remote.Config.ENDOFFONT;
+import static com.example.xyzreader.remote.Config.HTMLNEWLINE;
+import static com.example.xyzreader.remote.Config.HTMLREGEX;
+import static com.example.xyzreader.remote.Config.JAVAREGEXPATTERNMATCHER;
+import static com.example.xyzreader.remote.Config.NEWLINE;
+import static com.example.xyzreader.remote.Config.NOTAVAILABLE;
+import static com.example.xyzreader.remote.Config.RESOURCETYPE;
+import static com.example.xyzreader.remote.Config.SAMPLETEXT;
+import static com.example.xyzreader.remote.Config.TEXTTYPE;
+import static com.example.xyzreader.remote.Config.TYPEFACEASSETS;
+import static com.example.xyzreader.remote.Config.XYZREADERNAME;
+
 
 public class ArticleDetailFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = "ArticleDetailFragment";
-
-    public static final String ARG_ITEM_ID = "item_id";
-    public static final String LAYOUT_DECISION = "layout_decision";
-    private static final float PARALLAX_FACTOR = 1.25f;
-
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
     private int mMutedColor = 0xFF333333;
-    private ObservableScrollView mScrollView;
     private DrawInsetsFrameLayout mDrawInsetsFrameLayout;
     private ColorDrawable mStatusBarColorDrawable;
-    private View linearcontainer;
     private int mTopInset;
-    private View mPhotoContainerView;
     private ImageView mPhotoView;
-    private int mScrollY = 1;
     private boolean mIsCard = false;
     private int mStatusBarFullOpacityBottom;
     private View mMaxWidthContainer;
     private AppCompatActivity activity;
-    private Boolean layoutdecision;
-
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
-    // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
-    // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2, 1, 1);
 
     public ArticleDetailFragment() {
@@ -112,7 +106,6 @@ public class ArticleDetailFragment extends Fragment implements
 
         Bundle arguments = new Bundle();
         arguments.putLong(ARG_ITEM_ID, itemId);
-        arguments.putBoolean(LAYOUT_DECISION, layout);
         ArticleDetailFragment fragment = new ArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
@@ -124,9 +117,6 @@ public class ArticleDetailFragment extends Fragment implements
 
         if (getArguments().containsKey(ARG_ITEM_ID)) {
             mItemId = getArguments().getLong(ARG_ITEM_ID);
-        }
-        if (getArguments().containsKey(LAYOUT_DECISION)) {
-            layoutdecision = getArguments().getBoolean(LAYOUT_DECISION);
         }
         mIsCard = getResources().getBoolean(R.bool.detail_is_card);
         mStatusBarFullOpacityBottom = getResources().getDimensionPixelSize(
@@ -164,6 +154,7 @@ public class ArticleDetailFragment extends Fragment implements
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -173,7 +164,7 @@ public class ArticleDetailFragment extends Fragment implements
                     return true;
                 }
             case (R.id.refresh):
-                @SuppressWarnings("ResourceType") Snackbar snack = Snackbar.make(mRootView, R.string.swipe_layout_not_supported, Snackbar.LENGTH_LONG).setDuration(3000);
+                @SuppressWarnings(RESOURCETYPE) Snackbar snack = Snackbar.make(mRootView, R.string.swipe_layout_not_supported, Snackbar.LENGTH_LONG).setDuration(3000);
                 snack.setAction(R.string.dismiss, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -202,6 +193,7 @@ public class ArticleDetailFragment extends Fragment implements
         mDrawInsetsFrameLayout = new DrawInsetsFrameLayout(getActivityCast(), attrs);
         mMaxWidthContainer = new MaxWidthLinearLayout(getActivityCast(), attrs);
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -243,14 +235,15 @@ public class ArticleDetailFragment extends Fragment implements
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle("          xyz Reader");
+                    collapsingToolbar.setTitle(getWhiteSpace(20) + XYZREADERNAME);
                     isShow = true;
                 } else if (isShow) {
-                    collapsingToolbar.setTitle("");
+                    collapsingToolbar.setTitle(EMPTYNONNULL);
                     isShow = false;
                 }
             }
         });
+
 
         toolbar.setTitle(null);
         toolbar.inflateMenu(R.menu.main);
@@ -262,8 +255,8 @@ public class ArticleDetailFragment extends Fragment implements
             @Override
             public void onClick(View view) {
                 startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("text/plain")
-                        .setText("Some sample text")
+                        .setType(TEXTTYPE)
+                        .setText(SAMPLETEXT)
                         .getIntent(), getString(R.string.action_share)));
             }
         });
@@ -272,6 +265,7 @@ public class ArticleDetailFragment extends Fragment implements
         updateStatusBar();
         return mRootView;
     }
+
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -290,19 +284,6 @@ public class ArticleDetailFragment extends Fragment implements
         }
     }
 
-    static float progress(float v, float min, float max) {
-        return constrain((v - min) / (max - min), 0, 1);
-    }
-
-    static float constrain(float val, float min, float max) {
-        if (val < min) {
-            return min;
-        } else if (val > max) {
-            return max;
-        } else {
-            return val;
-        }
-    }
 
     private Date parsePublishedDate() {
         try {
@@ -310,7 +291,6 @@ public class ArticleDetailFragment extends Fragment implements
             return dateFormat.parse(date);
         } catch (ParseException ex) {
             Log.e(TAG, ex.getMessage());
-            Log.i(TAG, "passing today's date");
             return new Date();
         }
     }
@@ -338,26 +318,25 @@ public class ArticleDetailFragment extends Fragment implements
                                 publishedDate.getTime(),
                                 System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + " by <font color='#ffffff'>"
+                                + BYFONTCOLOUR
                                 + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
+                                + ENDOFFONT));
 
             } else {
                 bylineView.setText(Html.fromHtml(
-                        outputFormat.format(publishedDate) + " by <font color='#ffffff'>"
+                        outputFormat.format(publishedDate) + BYFONTCOLOUR
                                 + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + "</font>"));
+                                + ENDOFFONT));
 
             }
 
-            final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
+            final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll(HTMLREGEX, HTMLNEWLINE)).toString();
             final NestedScrollView scrollView = mRootView.findViewById(R.id.nested_scrollview);
 
             if (scrollView != null) {
                 scrollView.getViewTreeObserver()
                         .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                            Integer number = 80;
-                            AsyncTask asyncTask;
+                            Integer number = 80; // number of groups
                             Stack<AsyncSupplierTextView> stack = new Stack<>();
 
                             @Override
@@ -392,9 +371,9 @@ public class ArticleDetailFragment extends Fragment implements
                             if (bitmap != null) {
 
                                 // Background Thread...
-                          //      Palette p = Pallete.
-                         //        Palette p = Palette.generate(bitmap, 12);
-                        //        mMutedColor = p.getDarkMutedColor(0xFF333333);
+                                //      Palette p = Pallete.
+                                //        Palette p = Palette.generate(bitmap, 12);
+                                //        mMutedColor = p.getDarkMutedColor(0xFF333333);
 
                                 GlideApp.with(getActivity())
                                         .load(imageContainer.getBitmap())
@@ -413,11 +392,16 @@ public class ArticleDetailFragment extends Fragment implements
                     });
         } else {
             mRootView.setVisibility(View.GONE);
-            titleView.setText("N/A");
-            bylineView.setText("N/A");
-            //   bodyView.setText("N/A");
+            titleView.setText(NOTAVAILABLE);
+            bylineView.setText(NOTAVAILABLE);
+            TextView textView =  mRootView.findViewById(R.id.article_body);
+            textView.setText(NOTAVAILABLE);
         }
     }
+
+
+
+
     public void createPaletteAsync(Bitmap bitmap) {
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             public void onGenerated(Palette p) {
@@ -444,7 +428,6 @@ public class ArticleDetailFragment extends Fragment implements
 
         mCursor = data;
         if (mCursor != null && !mCursor.moveToFirst()) {
-            Log.e(TAG, "Error reading item detail cursor");
             mCursor.close();
             mCursor = null;
         }
@@ -458,31 +441,20 @@ public class ArticleDetailFragment extends Fragment implements
         bindViews();
     }
 
-    public int getUpButtonFloor() {
-        if (mPhotoContainerView == null || mPhotoView.getHeight() == 0) {
-            return Integer.MAX_VALUE;
-        }
-
-        // account for parallax
-        return mIsCard
-                ? (int) mPhotoContainerView.getTranslationY() + mPhotoView.getHeight() - mScrollY
-                : mPhotoView.getHeight() - mScrollY;
-    }
-
     public static String getArticleDetailTag(final long articleId) {
         return ARG_ITEM_ID + articleId;
     }
 
     private class AsyncSupplierTextView extends AsyncTask<Void, Void, String> {
 
-        Integer mNumber;
+        Integer mGroupCount;
         String mString;
         Handler mHandler = new Handler();
         private AlertDialog mDialog;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        public AsyncSupplierTextView(Integer number, String string) {
-            mNumber = number;
+        public AsyncSupplierTextView(Integer groupcount, String string) {
+            mGroupCount = groupcount;
             mString = string;
             builder.setCancelable(true);
             builder.setView(R.layout.progressdialog);
@@ -497,9 +469,9 @@ public class ArticleDetailFragment extends Fragment implements
         @Override
         protected String doInBackground(Void... strings) {
 
-            mString = mString.replaceAll("\\s+", " ");
+            mString = mString.replaceAll(CLEARWHITESPACEFULL, BLANKSPACE);
 
-            final Pattern pattern = Pattern.compile("([A-Z] [^\\.?]*[\\.!?])");
+            final Pattern pattern = Pattern.compile(JAVAREGEXPATTERNMATCHER);
             final Matcher matcher = pattern.matcher(mString);
             final String data = getString(matcher);
 
@@ -507,7 +479,7 @@ public class ArticleDetailFragment extends Fragment implements
                 @Override
                 public void run() {
                     TextView bodyView = mRootView.findViewById(R.id.article_body);
-                    bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
+                    bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), TYPEFACEASSETS));
                     bodyView.setText(data);
                 }
             });
@@ -515,13 +487,13 @@ public class ArticleDetailFragment extends Fragment implements
         }
 
         private String getString(Matcher matcher) {
-            String data = "";
+            String data = EMPTYNONNULL;
 
             for (int i = 1; matcher.find(); i++) {
-                if (i > mNumber) {
+                if (i > mGroupCount) {
                     break;
                 }
-                data += matcher.group() + "\n";
+                data += matcher.group() + NEWLINE;
             }
             return data;
         }
@@ -535,4 +507,13 @@ public class ArticleDetailFragment extends Fragment implements
             mDialog.cancel();
         }
     }
+
+    private static String getWhiteSpace(int size) {
+        StringBuilder builder = new StringBuilder(size);
+        for (int i = 0; i < size; i++) {
+            builder.append(' ');
+        }
+        return builder.toString();
+    }
+
 }

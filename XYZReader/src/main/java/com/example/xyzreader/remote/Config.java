@@ -21,6 +21,7 @@ public class Config {
 
     public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
     public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
+    public static final int STAGGEREDGRIDCOLUMNCOUNT = 2;
 
     public static final String ILLEGALARGUMENTEXCEPMOD = "invalid orientation";
     public static final String ARG_ITEM_ID = "item_id";
@@ -32,13 +33,34 @@ public class Config {
     public static final String DEFTYPE = "dimen";
     public static final String DEFPACKAGE = "android";
 
+    public static final String RESOURCETYPE = "ResourceType";
+
+    public static final String XYZREADERNAME = "xyzReader";
+    public static final String TEXTTYPE = "text/plain";
+    public static final String SAMPLETEXT = "Some sample text";
+
+    public static final String HTMLREGEX = "(\r\n|\n)";
+    public static final String HTMLNEWLINE = "<br />";
+    public static final String BYFONTCOLOUR = " by <font color='#ffffff'>";
+    public static final String ENDOFFONT = "</font>";
+
+    public static final String NOTAVAILABLE = "N/A";
+
+    public static final String JAVAREGEXPATTERNMATCHER = "([A-Z] [^\\.?]*[\\.!?])";
+    public static final String CLEARWHITESPACEFULL = "\\s+";
+    public static final String BLANKSPACE = " ";
+    public static final String EMPTYNONNULL = "";
+    public static final String NEWLINE = "\n";
+    public static final String TYPEFACEASSETS = "Rosario-Regular.ttf";
+
+
     public static final URL BASE_URL;
     private static String TAG = Config.class.toString();
 
     static {
         URL url = null;
         try {
-            url = new URL("https://go.udacity.com/xyz-reader-json" );
+            url = new URL("https://go.udacity.com/xyz-reader-json");
         } catch (IOException e) {
             Log.e(TAG, "Error fetching url");
             throw new RuntimeException(e);
@@ -46,6 +68,7 @@ public class Config {
 
         BASE_URL = url;
     }
+
     public static boolean isRTL() {
         return TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault()) == ViewCompat.LAYOUT_DIRECTION_RTL;
     }
