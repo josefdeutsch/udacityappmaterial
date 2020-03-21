@@ -55,7 +55,7 @@ import com.example.xyzreader.data.ArticleLoader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v4.app.LoaderManager;
+
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
@@ -133,7 +133,7 @@ public class ArticleDetailFragment extends Fragment implements
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             setTransparentStatusBarMarshmallow();
-            window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparentSatusBar));
+            window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparent_statusbar));
         }
     }
 

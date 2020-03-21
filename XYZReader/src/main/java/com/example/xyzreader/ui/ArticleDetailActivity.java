@@ -355,13 +355,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         mPagerAdapter.swapCursor(cursor);
 
         if (mStartId > 0) {
-            // Select the start ID
             mCursor.moveToFirst();
-            // TODO: optimize
-            //  if(cursor != null && cursor.getCount() > 0)  {
-            //     Log.i("haha","id: " + cursorLoader.getId());
-            //     adapter.swapCursor(cursor);
-            //  }
             while (!mCursor.isAfterLast()) {
                 if (mCursor.getLong(ArticleLoader.Query._ID) == mStartId) {
                     // Log.d(TAG, "onLoadFinished: " + "kdjshdkjsdhasd");
