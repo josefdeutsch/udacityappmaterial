@@ -4,20 +4,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_marginLeft="4dp"
-    android:layout_marginRight="4dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
+    android:layout_marginLeft="@dimen/mtrl_card_padding"
+    android:layout_marginRight="@dimen/mtrl_card_padding"
+    android:layout_marginTop="@dimen/mtrl_card_padding"
+    android:layout_marginBottom="@dimen/mtrl_card_padding"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?selectableItemBackground"
+    android:elevation="@dimen/mtrl_card_elevation"
     >
 
     <android.support.constraint.ConstraintLayout
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="8dp">
+        android:paddingBottom="@dimen/mtrl_card_constraint_layout_padding_bottom">
 
         <com.example.xyzreader.ui.components.DynamicHeightNetworkImageView
             android:id="@+id/thumbnail"
@@ -33,13 +34,13 @@
             android:id="@+id/article_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginEnd="@dimen/mtrl_card_article_title_margin_end"
+            android:layout_marginStart="@dimen/mtrl_card_article_title_margin_start"
+            android:layout_marginTop="@dimen/mtrl_card_article_title_margin_top"
             android:ellipsize="end"
             android:maxLines="4"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
+            android:paddingEnd="@dimen/mtrl_card_article_title_padding_end"
+            android:paddingStart="@dimen/mtrl_card_article_title_margin_start"
             android:textAppearance="@style/TextAppearance.AppCompat.Title"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -50,18 +51,19 @@
             android:id="@+id/article_subtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginEnd="@dimen/mtrl_card_article_subtitle_margin_end"
+            android:layout_marginStart="@dimen/mtrl_card_article_subtitle_margin_start"
             android:ellipsize="end"
             android:maxLines="2"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
+            android:paddingEnd="@dimen/mtrl_card_article_title_padding_end"
+            android:paddingStart="@dimen/mtrl_card_article_subtitle_padding_start"
             android:textAppearance="@style/TextAppearance.AppCompat.Body1"
             android:textColor="@color/secondaryTextColor"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/article_title"
             tools:text="default" />
+
 
     </android.support.constraint.ConstraintLayout>
 

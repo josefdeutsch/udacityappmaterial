@@ -2,16 +2,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="20dp">
+    android:padding="@dimen/progress_dialog_padding"
+    android:elevation="@dimen/progress_dialog_elevation"
+    >
     <ProgressBar
-        android:layout_width="0dp"
+        android:layout_width="@dimen/progress_dialog_elevation_progress_bar_width"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:indeterminateTint="#ff0000"
         />
 
     <TextView
-        android:layout_width="0dp"
+        android:layout_width="@dimen/progress_dialog_textview_width"
         android:layout_height="match_parent"
         android:layout_weight="4"
         android:gravity="center"

@@ -17,5 +17,6 @@
     <string name="swipe_layout_not_supported">SwipeLayout needs to be parent of Grid or ListView</string>
     <string name="translation">translation</string>
     <string name="windowinsets">windowinsets</string>
+    <string name="mtrl_card_article_title_max_lines">4</string>
 
 </resources>

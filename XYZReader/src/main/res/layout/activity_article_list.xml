@@ -14,7 +14,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="4dp"
+            android:elevation="@dimen/article_list_toolbar_elevation"
             app:layout_scrollFlags="scroll"
             android:background="?attr/colorPrimary"
             android:theme="@style/Theme.Bacon.AppBarOverlay"
@@ -36,10 +36,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
-            android:paddingBottom="28dp"
-            android:paddingEnd="8dp"
-            android:paddingStart="8dp"
-            android:paddingTop="8dp"
+            android:paddingBottom="@dimen/article_list_recycler_view_padding_bottom"
+            android:paddingEnd="@dimen/article_list_recycler_view_padding_end"
+            android:paddingStart="@dimen/article_list_recycler_view_padding_start"
+            android:paddingTop="@dimen/article_list_recycler_view_padding_top"
             android:scrollbarStyle="outsideOverlay" />
 
     </android.support.v4.widget.SwipeRefreshLayout>

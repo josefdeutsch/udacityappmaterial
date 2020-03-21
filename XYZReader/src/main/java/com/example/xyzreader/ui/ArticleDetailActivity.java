@@ -14,14 +14,11 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
@@ -29,7 +26,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.view.WindowInsetsCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
@@ -43,7 +39,6 @@ import android.view.WindowManager;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
-import com.example.xyzreader.remote.Config;
 import com.example.xyzreader.ui.components.CursorFragmentPagerAdapter;
 import java.util.Map;
 
@@ -84,7 +79,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
         // MaterialDesign introduced in Lollipop
 
-        //possible workaround in KITKAT - intercept WindowManager crop layout;
+        //possible workaround - intercept WindowManager crop layout;
         //bpplyTranslationToUpButtonContainer(Build.VERSION_CODES.KITKAT_WATCH);
 
 
@@ -111,7 +106,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     private void setupViewPager() {
         mPagerAdapter = new MyPagerAdapter2(getSupportFragmentManager());
-        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager = findViewById(R.id.pager);
         setupViewPagerViewPort();
         setupViewPagerListener();
         mPager.setAdapter(mPagerAdapter);
@@ -284,7 +279,7 @@ public class ArticleDetailActivity extends AppCompatActivity
                     .getDisplayMetrics().scaledDensity);
             localLayoutParams.format = PixelFormat.RGBA_F16;
 
-            customViewGroup view = new customViewGroup(this);
+            CustomViewGroup view = new CustomViewGroup(this);
 
             manager.addView(view, localLayoutParams);
 
@@ -321,9 +316,9 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
     };
 
-    public class customViewGroup extends ViewGroup {
+    public class CustomViewGroup extends ViewGroup {
 
-        public customViewGroup(Context context) {
+        public CustomViewGroup(Context context) {
             super(context);
         }
         @Override
@@ -332,7 +327,6 @@ public class ArticleDetailActivity extends AppCompatActivity
 
         @Override
         public boolean onInterceptTouchEvent(MotionEvent ev) {
-            Log.v("customViewGroup", "**********Intercepted");
             return true;
         }
     }
@@ -504,33 +498,6 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
 
     }
-
-    public class FragmentPager extends com.example.xyzreader.ui.components.FragmentStatePagerAdapter {
-
-        public FragmentPager(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Log.d(TAG, "getItem: " + position);
-            mCursor.moveToPosition(position);
-            return ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID), true);
-        }
-
-
-        @Override
-        public int getCount() {
-            if (mCursor != null) return mCursor.getCount();
-            else return 0;
-        }
-
-        public void swapCursor(Cursor cursor) {
-            mCursor = cursor;
-            notifyDataSetChanged();
-        }
-    }
-
 }
 
 

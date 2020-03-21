@@ -218,21 +218,20 @@ public class ArticleDetailFragment extends Fragment implements
                 @Override
                 public void onInsetsChanged(Rect insets) {
                     mTopInset = insets.top;
-                    Log.d(TAG, "onInsetsChanged: " + mTopInset);
                 }
             });
         }
 
-        final Toolbar toolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
+        final Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
 
         activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-        AppBarLayout appBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar);
+        AppBarLayout appBarLayout = mRootView.findViewById(R.id.appbar);
 
         final CollapsingToolbarLayout collapsingToolbar =
-                (CollapsingToolbarLayout) mRootView.findViewById(R.id.collapsing_toolbar);
+                mRootView.findViewById(R.id.collapsing_toolbar);
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
@@ -257,7 +256,7 @@ public class ArticleDetailFragment extends Fragment implements
         toolbar.inflateMenu(R.menu.main);
 
         mStatusBarColorDrawable = new ColorDrawable(0);
-        mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
+        mPhotoView = mRootView.findViewById(R.id.photo);
 
         mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -270,7 +269,7 @@ public class ArticleDetailFragment extends Fragment implements
         });
 
         bindViews();
-        //updateStatusBar();
+        updateStatusBar();
         return mRootView;
     }
 
@@ -321,8 +320,8 @@ public class ArticleDetailFragment extends Fragment implements
             return;
         }
 
-        TextView titleView = (TextView) mRootView.findViewById(R.id.article_title);
-        TextView bylineView = (TextView) mRootView.findViewById(R.id.article_byline);
+        TextView titleView = mRootView.findViewById(R.id.article_title);
+        TextView bylineView = mRootView.findViewById(R.id.article_byline);
 
         bylineView.setMovementMethod(new LinkMovementMethod());
 
@@ -352,7 +351,7 @@ public class ArticleDetailFragment extends Fragment implements
             }
 
             final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")).toString();
-            final NestedScrollView scrollView = (NestedScrollView) mRootView.findViewById(R.id.nested_scrollview);
+            final NestedScrollView scrollView = mRootView.findViewById(R.id.nested_scrollview);
 
             if (scrollView != null) {
                 scrollView.getViewTreeObserver()
@@ -393,8 +392,9 @@ public class ArticleDetailFragment extends Fragment implements
                             if (bitmap != null) {
 
                                 // Background Thread...
-                                Palette p = Palette.generate(bitmap, 12);
-                                mMutedColor = p.getDarkMutedColor(0xFF333333);
+                          //      Palette p = Pallete.
+                         //        Palette p = Palette.generate(bitmap, 12);
+                        //        mMutedColor = p.getDarkMutedColor(0xFF333333);
 
                                 GlideApp.with(getActivity())
                                         .load(imageContainer.getBitmap())
@@ -418,6 +418,14 @@ public class ArticleDetailFragment extends Fragment implements
             //   bodyView.setText("N/A");
         }
     }
+    public void createPaletteAsync(Bitmap bitmap) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                // Use generated instance
+            }
+        });
+    }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -498,7 +506,7 @@ public class ArticleDetailFragment extends Fragment implements
             mHandler.post(new Runnable() {
                 @Override
                 public void run() {
-                    TextView bodyView = (TextView) mRootView.findViewById(R.id.article_body);
+                    TextView bodyView = mRootView.findViewById(R.id.article_body);
                     bodyView.setTypeface(Typeface.createFromAsset(getResources().getAssets(), "Rosario-Regular.ttf"));
                     bodyView.setText(data);
                 }
