@@ -13,7 +13,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static com.example.xyzreader.remote.Config.ERRORFETCHINGJSON;
+import static com.example.xyzreader.remote.Config.ERRORPARSINGJSON;
+import static com.example.xyzreader.remote.Config.JSONEXCEPTIONMOD;
+
 public class RemoteEndpointUtil {
+
     private static final String TAG = "RemoteEndpointUtil";
 
     private RemoteEndpointUtil() {
@@ -24,20 +29,19 @@ public class RemoteEndpointUtil {
         try {
             itemsJson = fetchPlainText(Config.BASE_URL);
         } catch (Exception e) {
-            Log.e(TAG, "Error fetching items JSON", e);
+            Log.e(TAG, ERRORFETCHINGJSON, e);
             return null;
         }
 
-        // Parse JSON
         try {
             JSONTokener tokener = new JSONTokener(itemsJson);
             Object val = tokener.nextValue();
             if (!(val instanceof JSONArray)) {
-                throw new JSONException("Expected JSONArray");
+                throw new JSONException(JSONEXCEPTIONMOD);
             }
             return (JSONArray) val;
         } catch (JSONException e) {
-            Log.e(TAG, "Error parsing items JSON", e);
+            Log.e(TAG, ERRORPARSINGJSON, e);
         }
 
         return null;

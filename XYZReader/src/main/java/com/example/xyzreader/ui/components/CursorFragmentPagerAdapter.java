@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
 import android.view.ViewGroup;
@@ -18,7 +17,6 @@ import java.util.HashMap;
 
 public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
-    private static final String TAG = "CursorFragmentPagerAdap";
     protected boolean mDataValid;
     protected Cursor mCursor;
     protected Context mContext;
@@ -26,24 +24,25 @@ public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapt
     protected ArrayList<Integer> mArrayList = new ArrayList<>();
     protected SparseArray<Fragment> fragments = new SparseArray<>();
     protected HashMap<Object, Integer> mObjectMap;
-   // protected ReverseHashMap<Object,Integer> myHashMap;
     protected int mRowIDColumn;
     public int rowId;
 
+
+    public static final String COLUMNNAME = "_id";
+    public static final String CURSOREXCEPTIONMOD = "this should only be called when the cursor is valid";
+
     public CursorFragmentPagerAdapter(Context context, FragmentManager fm, Cursor cursor) {
         super(fm);
-
         init(context, cursor);
     }
 
     void init(Context context, Cursor c) {
-      //  mCursorReference = new SparseIntArray();
         mObjectMap = new HashMap<Object, Integer>();
         boolean cursorPresent = c != null;
         mCursor = c;
         mDataValid = cursorPresent;
         mContext = context;
-        mRowIDColumn = cursorPresent ? c.getColumnIndexOrThrow("_id") : -1;
+        mRowIDColumn = cursorPresent ? c.getColumnIndexOrThrow(COLUMNNAME) : -1;
     }
 
     public Cursor getCursor() {
@@ -53,11 +52,8 @@ public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapt
     @Override
     public int getItemPosition(Object object) {
         Integer rowId = mObjectMap.get(object);
-      //  mCursorReference.append(rowId);
-        Log.d(TAG, "getItemPosition: "+rowId);
         if (rowId != null && mItemPositions != null) {
            int index = mItemPositions.get(rowId, POSITION_NONE);
-            Log.d(TAG, "cursorPosition: "+index);
             return mItemPositions.get(rowId, POSITION_NONE);
         }
         return POSITION_NONE;
@@ -81,7 +77,6 @@ public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapt
     @Override
     public Fragment getItem(int position) {
 
-        Log.d(TAG, "getItem: "+mCursor.getPosition());
         if (mDataValid) {
             // mCursor.moveToPosition(position);
             return getItemByReference(position);
@@ -104,7 +99,7 @@ public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapt
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         if (!mDataValid) {
-            throw new IllegalStateException("this should only be called when the cursor is valid");
+            throw new IllegalStateException(CURSOREXCEPTIONMOD);
         }
 
         //  if (!mCursor.moveToPosition(position)) {
@@ -113,7 +108,6 @@ public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapt
         mCursor.moveToPosition(position);
 
         rowId = mCursor.getInt(mRowIDColumn);
-        Log.d(TAG, "instantiateItem: "+rowId);
         mArrayList.add(rowId);
         //fragments.put(rowId, ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID), true));
     //    fragments.put(rowId, ArticleDetailFragment.newInstance(mCursor.getLong(ArticleLoader.Query._ID), true));
@@ -147,7 +141,7 @@ public abstract class CursorFragmentPagerAdapter extends FragmentStatePagerAdapt
         Cursor oldCursor = mCursor;
         mCursor = newCursor;
         if (newCursor != null) {
-            mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
+            mRowIDColumn = newCursor.getColumnIndexOrThrow(COLUMNNAME);
             mDataValid = true;
         } else {
             mRowIDColumn = -1;

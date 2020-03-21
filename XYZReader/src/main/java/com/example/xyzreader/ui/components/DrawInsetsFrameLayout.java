@@ -61,7 +61,6 @@ public class DrawInsetsFrameLayout extends FrameLayout {
         final TypedArray a = context.obtainStyledAttributes(attrs,
                 R.styleable.DrawInsetsFrameLayout, defStyle, 0);
         assert a != null;
-        Log.d(TAG, "init: ");
         mInsetBackground = a.getDrawable(R.styleable.DrawInsetsFrameLayout_insetBackground);
         a.recycle();
     }
@@ -156,7 +155,7 @@ public class DrawInsetsFrameLayout extends FrameLayout {
         }
     }
 
-    public static interface OnInsetsCallback {
-        public void onInsetsChanged(Rect insets);
+    public interface OnInsetsCallback {
+        void onInsetsChanged(Rect insets);
     }
 }

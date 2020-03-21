@@ -19,9 +19,12 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+
+import static com.example.xyzreader.remote.Config.HORIZONTAL_LIST;
+import static com.example.xyzreader.remote.Config.ILLEGALARGUMENTEXCEPMOD;
+import static com.example.xyzreader.remote.Config.VERTICAL_LIST;
 
 public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -29,12 +32,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
             android.R.attr.listDivider
     };
 
-    public static final int HORIZONTAL_LIST = LinearLayoutManager.HORIZONTAL;
-
-    public static final int VERTICAL_LIST = LinearLayoutManager.VERTICAL;
-
     private Drawable mDivider;
-
     private int mOrientation;
 
     public DividerItemDecoration(Context context, Drawable divider, int orientation) {
@@ -44,7 +42,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
     public void setOrientation(int orientation) {
         if (orientation != HORIZONTAL_LIST && orientation != VERTICAL_LIST) {
-            throw new IllegalArgumentException("invalid orientation");
+            throw new IllegalArgumentException(ILLEGALARGUMENTEXCEPMOD);
         }
         mOrientation = orientation;
     }

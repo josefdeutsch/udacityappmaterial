@@ -42,28 +42,30 @@ import com.example.xyzreader.data.ItemsContract;
 import com.example.xyzreader.ui.components.CursorFragmentPagerAdapter;
 import java.util.Map;
 
-/**
- * An activity representing a single Article detail screen, letting you swipe between articles.
- */
+import static com.example.xyzreader.remote.Config.ARG_ITEM_ID;
+import static com.example.xyzreader.remote.Config.DEFPACKAGE;
+import static com.example.xyzreader.remote.Config.DEFTYPE;
+import static com.example.xyzreader.remote.Config.PACKAGE;
+import static com.example.xyzreader.remote.Config.SHOW_SWIPE_MESSAGE;
+import static com.example.xyzreader.remote.Config.STATUSBARHEIGHT;
 
 public class ArticleDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String TAG = "ArticleDetailActivity";
+
     private Cursor mCursor;
     private long mStartId;
-    public static final String ARG_ITEM_ID = "item_id";
     private long mSelectedItemId;
     private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
     private int mTopInset;
-    private static final String TAG = "ArticleDetailActivity";
     private ViewPager mPager;
     private MyPagerAdapter2 mPagerAdapter;
     private View mUpButtonContainer;
     private View mUpButton;
     private int mTranslation;
-
     private int mCurrentPosition = 0;
-    public final String SHOW_SWIPE_MESSAGE = "show_swipe_message";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +79,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
         setupUpButton();
 
-        // MaterialDesign introduced in Lollipop
-
-        //possible workaround - intercept WindowManager crop layout;
         //bpplyTranslationToUpButtonContainer(Build.VERSION_CODES.KITKAT_WATCH);
-
 
         applyTranslationToUpButtonContainer(Build.VERSION_CODES.LOLLIPOP);
         verifyViewCompatWindowInsets(Build.VERSION_CODES.LOLLIPOP);
@@ -288,12 +286,14 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
     }
 
+
+
     @TargetApi(Build.VERSION_CODES.M)
     public void askpermission(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
 
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + getPackageName()));
+                    Uri.parse(PACKAGE + getPackageName()));
 
             startActivityForResult(intent, ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE);
             handler.postDelayed(checkOverlaySetting, 1000);
@@ -333,7 +333,7 @@ public class ArticleDetailActivity extends AppCompatActivity
 
     public int getStatusBarHeight() {
         int result = 0;
-        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = getResources().getIdentifier(STATUSBARHEIGHT, DEFTYPE, DEFPACKAGE);
         if (resourceId > 0) {
             result = getResources().getDimensionPixelSize(resourceId);
         }

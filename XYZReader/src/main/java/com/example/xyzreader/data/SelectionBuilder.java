@@ -69,8 +69,6 @@ public class SelectionBuilder {
                 throw new IllegalArgumentException(
                         "Valid selection required when including arguments=");
             }
-
-            // Shortcut when clause is empty
             return this;
         }
 
