@@ -52,13 +52,6 @@ import static com.example.xyzreader.remote.Config.HTMLNEWLINE;
 import static com.example.xyzreader.remote.Config.RESOURCETYPE;
 import static com.example.xyzreader.remote.Config.STAGGEREDGRIDCOLUMNCOUNT;
 
-/**
- * An activity representing a list of Articles. This activity has different presentations for
- * handset and tablet-size devices. On handsets, the activity presents a list of items, which when
- * touched, lead to a {@link ArticleDetailActivity} representing item details. On tablets, the
- * activity presents a grid of items as cards.
- */
-
 public class ArticleListActivity extends AppCompatActivity {
 
     private static final String TAG = ArticleListActivity.class.toString();
@@ -67,25 +60,29 @@ public class ArticleListActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private View mRootView;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
-    // Use default locale format
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
-    // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
-
     private Adapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mRootView = View.inflate(this, R.layout.activity_article_list, null);
         setContentView(mRootView);
-
         mRecyclerView = findViewById(R.id.recycler_view);
+        setupSupportedActionBar();
+        setupSwipeRefreshLayout();
+        refresh();
+    }
 
+    private void setupSupportedActionBar() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setLogo(R.drawable.logo);
+    }
 
+    private void setupSwipeRefreshLayout() {
         mSwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -93,9 +90,6 @@ public class ArticleListActivity extends AppCompatActivity {
                 refresh();
             }
         });
-
-        refresh();
-
     }
 
     private void refresh() {

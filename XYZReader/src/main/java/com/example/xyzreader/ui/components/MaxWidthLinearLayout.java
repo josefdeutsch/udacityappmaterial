@@ -16,8 +16,10 @@
 
 package com.example.xyzreader.ui.components;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
@@ -26,6 +28,7 @@ import com.example.xyzreader.R;
 /**
  * A simple {@link LinearLayout} subclass that has a maxWidth
  */
+
 public class MaxWidthLinearLayout extends LinearLayout {
     private static final int[] ATTRS = {
             android.R.attr.maxWidth
@@ -47,7 +50,7 @@ public class MaxWidthLinearLayout extends LinearLayout {
         super(context, attrs, defStyle);
         init(context, attrs, defStyle, 0);
     }
-
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public MaxWidthLinearLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init(context, attrs, defStyleAttr, defStyleRes);

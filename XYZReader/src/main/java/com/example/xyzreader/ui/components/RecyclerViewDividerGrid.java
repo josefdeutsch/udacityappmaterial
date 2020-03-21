@@ -1,9 +1,11 @@
 package com.example.xyzreader.ui.components;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -15,7 +17,7 @@ public class RecyclerViewDividerGrid extends RecyclerView.ItemDecoration {
 
     // Used to draw item split line.
     protected Drawable itemDividerDrawable;
-
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public RecyclerViewDividerGrid(Context ctx) {
         itemDividerDrawable = ctx.getDrawable(R.drawable.padded_divider);
     }

@@ -1,6 +1,7 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -18,7 +19,8 @@
             app:layout_scrollFlags="scroll"
             android:background="?attr/colorPrimary"
             android:theme="@style/Theme.Bacon.AppBarOverlay"
-            app:popupTheme="@style/Theme.Bacon.PopupOverlay">
+            app:popupTheme="@style/Theme.Bacon.PopupOverlay"
+            tools:targetApi="lollipop">
 
         </android.support.v7.widget.Toolbar>
 

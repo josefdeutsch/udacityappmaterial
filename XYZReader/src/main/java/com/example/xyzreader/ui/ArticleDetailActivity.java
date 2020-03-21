@@ -39,8 +39,6 @@ import android.view.WindowManager;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
 import com.example.xyzreader.data.ItemsContract;
-import com.example.xyzreader.ui.components.CursorFragmentPagerAdapter;
-import java.util.Map;
 
 import static com.example.xyzreader.remote.Config.ARG_ITEM_ID;
 import static com.example.xyzreader.remote.Config.DEFPACKAGE;
@@ -60,7 +58,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     private int mSelectedItemUpButtonFloor = Integer.MAX_VALUE;
     private int mTopInset;
     private ViewPager mPager;
-    private MyPagerAdapter2 mPagerAdapter;
+    private MyPagerAdapter mPagerAdapter;
     private View mUpButtonContainer;
     private View mUpButton;
     private int mTranslation;
@@ -103,7 +101,7 @@ public class ArticleDetailActivity extends AppCompatActivity
     }
 
     private void setupViewPager() {
-        mPagerAdapter = new MyPagerAdapter2(getSupportFragmentManager());
+        mPagerAdapter = new MyPagerAdapter(getSupportFragmentManager());
         mPager = findViewById(R.id.pager);
         setupViewPagerViewPort();
         setupViewPagerListener();
@@ -182,8 +180,9 @@ public class ArticleDetailActivity extends AppCompatActivity
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(getResources().getResourceName(R.string.translation), mTranslation);
-        outState.putInt(getResources().getResourceName(R.string.windowinsets),mTopInset);
+        outState.putInt(getResources().getResourceName(R.string.windowinsets), mTopInset);
     }
+
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -201,26 +200,26 @@ public class ArticleDetailActivity extends AppCompatActivity
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void verifyViewCompatWindowInsets(int buildversion) {
         if (Build.VERSION.SDK_INT >= buildversion) {
-        ViewCompat.setOnApplyWindowInsetsListener(mPager,
-                new OnApplyWindowInsetsListener() {
-                    @Override
-                    public WindowInsetsCompat onApplyWindowInsets(View v,
-                                                                  WindowInsetsCompat insets) {
-                        insets = ViewCompat.onApplyWindowInsets(v, insets);
-                        if (insets.isConsumed()) {
-                            return insets;
-                        }
-
-                        boolean consumed = false;
-                        for (int i = 0, count = mPager.getChildCount(); i < count; i++) {
-                            ViewCompat.dispatchApplyWindowInsets(mPager.getChildAt(i), insets);
+            ViewCompat.setOnApplyWindowInsetsListener(mPager,
+                    new OnApplyWindowInsetsListener() {
+                        @Override
+                        public WindowInsetsCompat onApplyWindowInsets(View v,
+                                                                      WindowInsetsCompat insets) {
+                            insets = ViewCompat.onApplyWindowInsets(v, insets);
                             if (insets.isConsumed()) {
-                                consumed = true;
+                                return insets;
                             }
+
+                            boolean consumed = false;
+                            for (int i = 0, count = mPager.getChildCount(); i < count; i++) {
+                                ViewCompat.dispatchApplyWindowInsets(mPager.getChildAt(i), insets);
+                                if (insets.isConsumed()) {
+                                    consumed = true;
+                                }
+                            }
+                            return consumed ? insets.consumeSystemWindowInsets() : insets;
                         }
-                        return consumed ? insets.consumeSystemWindowInsets() : insets;
-                    }
-                });
+                    });
         }
     }
 
@@ -239,6 +238,7 @@ public class ArticleDetailActivity extends AppCompatActivity
             });
         }
     }
+
     @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
     public void bpplyTranslationToUpButtonContainer(int buildversion) {
         if (Build.VERSION.SDK_INT >= buildversion) {
@@ -249,7 +249,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         }
     }
 
-    public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE= 2323;
+    public static int ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE = 2323;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -257,6 +257,7 @@ public class ArticleDetailActivity extends AppCompatActivity
             hasPermission();
         }
     }
+
     @TargetApi(Build.VERSION_CODES.M)
     private void hasPermission() {
         if (Settings.canDrawOverlays(this)) {
@@ -265,31 +266,25 @@ public class ArticleDetailActivity extends AppCompatActivity
             WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
             localLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
             localLayoutParams.gravity = Gravity.TOP;
-            localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|
-
-                    // this is to enable the notification to receive touch events
+            localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
                     WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
-                    // Draws over status bar
                     WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
-
             localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
             localLayoutParams.height = (int) (50 * getResources()
                     .getDisplayMetrics().scaledDensity);
-            localLayoutParams.format = PixelFormat.RGBA_F16;
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                localLayoutParams.format = PixelFormat.RGBA_F16;
+            }
             CustomViewGroup view = new CustomViewGroup(this);
-
             manager.addView(view, localLayoutParams);
-
             requestWindowFeature(Window.FEATURE_NO_TITLE);
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
     }
 
 
-
     @TargetApi(Build.VERSION_CODES.M)
-    public void askpermission(){
+    public void askpermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
 
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -321,6 +316,7 @@ public class ArticleDetailActivity extends AppCompatActivity
         public CustomViewGroup(Context context) {
             super(context);
         }
+
         @Override
         protected void onLayout(boolean changed, int l, int t, int r, int b) {
         }
@@ -386,22 +382,16 @@ public class ArticleDetailActivity extends AppCompatActivity
         mPagerAdapter.swapCursor(null);
     }
 
-    public void onUpButtonFloorChanged(long itemId, ArticleDetailFragment fragment) {
-        if (itemId == mSelectedItemId) {
-            updateUpButtonPosition();
-        }
-    }
-
     private void updateUpButtonPosition() {
-       int upButtonNormalBottom = mTopInset + mUpButton.getHeight();
-       mTranslation = mSelectedItemUpButtonFloor - upButtonNormalBottom;
-       mUpButton.setTranslationY(Math.min(mTranslation,0));
+        int upButtonNormalBottom = mTopInset + mUpButton.getHeight();
+        mTranslation = mSelectedItemUpButtonFloor - upButtonNormalBottom;
+        mUpButton.setTranslationY(Math.min(mTranslation, 0));
 
     }
 
-    private class MyPagerAdapter2 extends FragmentStatePagerAdapter {
+    private class MyPagerAdapter extends FragmentStatePagerAdapter {
 
-        public MyPagerAdapter2(FragmentManager fm) {
+        public MyPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -449,52 +439,6 @@ public class ArticleDetailActivity extends AppCompatActivity
             mCursor = cursor;
             notifyDataSetChanged();
         }
-    }
-
-
-
-
-    public class CursorPagerAdapter extends CursorFragmentPagerAdapter {
-
-        public CursorPagerAdapter(Context context, FragmentManager fm, Cursor cursor) {
-            super(context, fm, cursor);
-        }
-
-        @Override
-        public Fragment getItemByReference(int position) {
-
-            if (mObjectMap.size() == 0) return null;
-            else return getFragment(position);
-
-        }
-
-        public Fragment getFragment(int index) {
-            Fragment fragment = null;
-            if (mArrayList != null) {
-                for (Map.Entry<Object, Integer> entry : mObjectMap.entrySet()) {
-                    if (entry.getValue().equals(mArrayList.get(index))) {
-                        fragment = (Fragment) entry.getKey();
-                    }
-                }
-            }
-            return fragment;
-        }
-
-        public Fragment getFragments(int index) {
-            return fragments.get(mArrayList.get(index));
-        }
-
-        @Override
-        public void updateUI(ArticleDetailFragment object) {
-            {
-                ArticleDetailFragment fragment = object;
-                if (fragment != null) {
-                    // mSelectedItemUpButtonFloor = fragment.getUpButtonFloor();
-                    // updateUpButtonPosition();
-                }
-            }
-        }
-
     }
 }
 

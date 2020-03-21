@@ -1,8 +1,10 @@
 <com.example.xyzreader.ui.components.DrawInsetsFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cardview_light_background">
+    android:background="@color/cardview_light_background"
+    tools:ignore="InconsistentLayout">
 
     <android.support.design.widget.CoordinatorLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -137,7 +139,7 @@
             android:contentDescription="@string/action_share"
             android:elevation="@dimen/fab_elevation"
             android:src="@drawable/ic_share"
-            android:stateListAnimator="@anim/fab_state_list_anim" />
+            android:stateListAnimator="@animator/fab_state_list_anim" />
 
 
     </android.support.design.widget.CoordinatorLayout>

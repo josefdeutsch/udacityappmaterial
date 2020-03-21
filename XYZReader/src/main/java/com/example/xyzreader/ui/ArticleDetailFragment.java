@@ -55,6 +55,7 @@ import com.example.xyzreader.data.ArticleLoader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v4.app.LoaderManager;
 import com.example.xyzreader.ui.components.DrawInsetsFrameLayout;
 import com.example.xyzreader.ui.components.GlideApp;
 import com.example.xyzreader.ui.components.ImageLoaderHelper;
@@ -131,9 +132,7 @@ public class ArticleDetailFragment extends Fragment implements
             Window window = getActivity().getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-
             setTransparentStatusBarMarshmallow();
-
             window.setStatusBarColor(ContextCompat.getColor(getActivity(), R.color.transparentSatusBar));
         }
     }
@@ -153,7 +152,6 @@ public class ArticleDetailFragment extends Fragment implements
     public void onCreateOptionsMenu(final Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -202,28 +200,38 @@ public class ArticleDetailFragment extends Fragment implements
 
         mMaxWidthContainer = mRootView.findViewById(R.id.maxwidthlayout_container);
         mDrawInsetsFrameLayout = mRootView.findViewById(R.id.container);
-
+        mPhotoView = mRootView.findViewById(R.id.photo);
         setTransparentStatusBarLollipop();
+        initDrawInsetCallBack();
+        setupSupportedActionBar();
 
-        if (mDrawInsetsFrameLayout != null) {
-            mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
-                @Override
-                public void onInsetsChanged(Rect insets) {
-                    mTopInset = insets.top;
-                }
-            });
-        }
+        mStatusBarColorDrawable = new ColorDrawable(mMutedColor);
 
+        setupFloatingActionButton();
+
+        return mRootView;
+    }
+
+    private void setupSupportedActionBar() {
         final Toolbar toolbar = mRootView.findViewById(R.id.toolbar);
+        initSupportedToolbar(toolbar);
+        setupAppBarLayout();
+        toolbar.setTitle(null);
+        toolbar.inflateMenu(R.menu.main);
+    }
 
+    private void initSupportedToolbar(Toolbar toolbar) {
         activity = (AppCompatActivity) getActivity();
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+    }
 
+    private void setupAppBarLayout() {
         AppBarLayout appBarLayout = mRootView.findViewById(R.id.appbar);
 
         final CollapsingToolbarLayout collapsingToolbar =
                 mRootView.findViewById(R.id.collapsing_toolbar);
+
 
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             boolean isShow = false;
@@ -243,14 +251,20 @@ public class ArticleDetailFragment extends Fragment implements
                 }
             }
         });
+    }
 
+    private void initDrawInsetCallBack() {
+        if (mDrawInsetsFrameLayout != null) {
+            mDrawInsetsFrameLayout.setOnInsetsCallback(new DrawInsetsFrameLayout.OnInsetsCallback() {
+                @Override
+                public void onInsetsChanged(Rect insets) {
+                    mTopInset = insets.top;
+                }
+            });
+        }
+    }
 
-        toolbar.setTitle(null);
-        toolbar.inflateMenu(R.menu.main);
-
-        mStatusBarColorDrawable = new ColorDrawable(0);
-        mPhotoView = mRootView.findViewById(R.id.photo);
-
+    private void setupFloatingActionButton() {
         mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -260,154 +274,12 @@ public class ArticleDetailFragment extends Fragment implements
                         .getIntent(), getString(R.string.action_share)));
             }
         });
-
-        bindViews();
-        updateStatusBar();
-        return mRootView;
     }
-
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mRootView.requestApplyInsets();
-    }
-
-    private void updateStatusBar() {
-
-        if (mDrawInsetsFrameLayout != null) {
-            mStatusBarColorDrawable.setColor(Color.argb(Color.alpha(mMutedColor),
-                    (int) (Color.red(mMutedColor) * 0.9),
-                    (int) (Color.green(mMutedColor) * 0.9),
-                    (int) (Color.blue(mMutedColor) * 0.9)));
-            mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
-        }
-    }
-
-
-    private Date parsePublishedDate() {
-        try {
-            String date = mCursor.getString(ArticleLoader.Query.PUBLISHED_DATE);
-            return dateFormat.parse(date);
-        } catch (ParseException ex) {
-            Log.e(TAG, ex.getMessage());
-            return new Date();
-        }
-    }
-
-    private void bindViews() {
-        if (mRootView == null) {
-            return;
-        }
-
-        TextView titleView = mRootView.findViewById(R.id.article_title);
-        TextView bylineView = mRootView.findViewById(R.id.article_byline);
-
-        bylineView.setMovementMethod(new LinkMovementMethod());
-
-        if (mCursor != null) {
-            mRootView.setAlpha(0);
-            mRootView.setVisibility(View.VISIBLE);
-            mRootView.animate().alpha(1);
-
-            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            Date publishedDate = parsePublishedDate();
-            if (!publishedDate.before(START_OF_EPOCH.getTime())) {
-                bylineView.setText(Html.fromHtml(
-                        DateUtils.getRelativeTimeSpanString(
-                                publishedDate.getTime(),
-                                System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                                DateUtils.FORMAT_ABBREV_ALL).toString()
-                                + BYFONTCOLOUR
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + ENDOFFONT));
-
-            } else {
-                bylineView.setText(Html.fromHtml(
-                        outputFormat.format(publishedDate) + BYFONTCOLOUR
-                                + mCursor.getString(ArticleLoader.Query.AUTHOR)
-                                + ENDOFFONT));
-
-            }
-
-            final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll(HTMLREGEX, HTMLNEWLINE)).toString();
-            final NestedScrollView scrollView = mRootView.findViewById(R.id.nested_scrollview);
-
-            if (scrollView != null) {
-                scrollView.getViewTreeObserver()
-                        .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                            Integer number = 80; // number of groups
-                            Stack<AsyncSupplierTextView> stack = new Stack<>();
-
-                            @Override
-                            public void onScrollChanged() {
-                                if (scrollView.getChildAt(0).getBottom()
-                                        <= (scrollView.getHeight() + scrollView.getScrollY())) {
-                                    if (!stack.empty()) {
-                                        for (AsyncSupplierTextView item : stack) {
-                                            item.cancel(true);
-                                            stack.pop();
-                                        }
-                                    }
-                                    AsyncSupplierTextView asyncTask = new AsyncSupplierTextView(number, data);
-                                    asyncTask.execute();
-                                    stack.push(asyncTask);
-                                    number += 40;
-                                } else {
-
-                                }
-                            }
-                        });
-            }
-            new AsyncSupplierTextView(40, data).execute();
-
-
-            ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
-                    .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
-                        @Override
-                        public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
-                            Bitmap bitmap = imageContainer.getBitmap();
-
-                            if (bitmap != null) {
-
-                                // Background Thread...
-                                //      Palette p = Pallete.
-                                //        Palette p = Palette.generate(bitmap, 12);
-                                //        mMutedColor = p.getDarkMutedColor(0xFF333333);
-
-                                GlideApp.with(getActivity())
-                                        .load(imageContainer.getBitmap())
-                                        .centerCrop()
-                                        .into(mPhotoView);
-                                mRootView.findViewById(R.id.meta_bar)
-                                        .setBackgroundColor(mMutedColor);
-                                updateStatusBar();
-                            }
-                        }
-
-                        @Override
-                        public void onErrorResponse(VolleyError volleyError) {
-
-                        }
-                    });
-        } else {
-            mRootView.setVisibility(View.GONE);
-            titleView.setText(NOTAVAILABLE);
-            bylineView.setText(NOTAVAILABLE);
-            TextView textView =  mRootView.findViewById(R.id.article_body);
-            textView.setText(NOTAVAILABLE);
-        }
-    }
-
-
-
-
-    public void createPaletteAsync(Bitmap bitmap) {
-        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
-            public void onGenerated(Palette p) {
-                // Use generated instance
-            }
-        });
     }
 
 
@@ -439,6 +311,151 @@ public class ArticleDetailFragment extends Fragment implements
     public void onLoaderReset(@NonNull android.support.v4.content.Loader<Cursor> loader) {
         mCursor = null;
         bindViews();
+    }
+
+
+    private void bindViews() {
+        if (mRootView == null) {
+            return;
+        }
+        setupLayout();
+    }
+
+    private void setupLayout() {
+        TextView titleView = mRootView.findViewById(R.id.article_title);
+        TextView bylineView = mRootView.findViewById(R.id.article_byline);
+        bylineView.setMovementMethod(new LinkMovementMethod());
+
+        if (mCursor != null) {
+            mRootView.setAlpha(0);
+            mRootView.setVisibility(View.VISIBLE);
+            mRootView.animate().alpha(1);
+            titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
+            Date publishedDate = parsePublishedDate();
+            setupBylineView(bylineView, publishedDate);
+            final String data = Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll(HTMLREGEX, HTMLNEWLINE)).toString();
+            final NestedScrollView scrollView = mRootView.findViewById(R.id.nested_scrollview);
+            setupScrollView(data, scrollView);
+            setupBodyView(data);
+            setupImageLoader();
+
+        } else {
+            mRootView.setVisibility(View.GONE);
+            titleView.setText(NOTAVAILABLE);
+            bylineView.setText(NOTAVAILABLE);
+            TextView textView =  mRootView.findViewById(R.id.article_body);
+            textView.setText(NOTAVAILABLE);
+        }
+    }
+
+    private void setupBylineView(TextView bylineView, Date publishedDate) {
+        if (!publishedDate.before(START_OF_EPOCH.getTime())) {
+            bylineView.setText(Html.fromHtml(
+                    DateUtils.getRelativeTimeSpanString(
+                            publishedDate.getTime(),
+                            System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
+                            DateUtils.FORMAT_ABBREV_ALL).toString()
+                            + BYFONTCOLOUR
+                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                            + ENDOFFONT));
+
+        } else {
+            bylineView.setText(Html.fromHtml(
+                    outputFormat.format(publishedDate) + BYFONTCOLOUR
+                            + mCursor.getString(ArticleLoader.Query.AUTHOR)
+                            + ENDOFFONT));
+
+        }
+    }
+
+    private void setupBodyView(String data) {
+        final Integer groupCount = 40;
+        new AsyncSupplierTextView(groupCount, data).execute();
+    }
+
+    private void setupImageLoader() {
+        ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
+                .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
+                    @Override
+                    public void onResponse(ImageLoader.ImageContainer imageContainer, boolean b) {
+                        Bitmap bitmap = imageContainer.getBitmap();
+
+                        if (bitmap != null) {
+                            createPaletteAsync(bitmap);
+
+                            GlideApp.with(getActivity())
+                                    .load(imageContainer.getBitmap())
+                                    .centerCrop()
+                                    .into(mPhotoView);
+                        }
+                    }
+
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                        GlideApp.with(getActivity())
+                                .load(R.drawable.empty_detail)
+                                .centerCrop()
+                                .into(mPhotoView);
+                    }
+                });
+    }
+
+    private void setupScrollView(final String data, final NestedScrollView scrollView) {
+        if (scrollView != null) {
+            scrollView.getViewTreeObserver()
+                    .addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+                        Integer number = 80; // number of groups
+                        Stack<AsyncSupplierTextView> stack = new Stack<>();
+
+                        @Override
+                        public void onScrollChanged() {
+                            if (scrollView.getChildAt(0).getBottom()
+                                    <= (scrollView.getHeight() + scrollView.getScrollY())) {
+                                if (!stack.empty()) {
+                                    for (AsyncSupplierTextView item : stack) {
+                                        item.cancel(true);
+                                        stack.pop();
+                                    }
+                                }
+                                AsyncSupplierTextView asyncTask = new AsyncSupplierTextView(number, data);
+                                asyncTask.execute();
+                                stack.push(asyncTask);
+                                number += 40;
+                            } else {
+
+                            }
+                        }
+                    });
+        }
+    }
+
+
+    public void createPaletteAsync(Bitmap bitmap) {
+        Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+                int color =  p.getDarkMutedColor(0xFF333333);
+                if (mDrawInsetsFrameLayout != null) {
+                    mStatusBarColorDrawable.setColor(Color.argb(Color.alpha(color),
+                            (int) (Color.red(color) * 0.9),
+                            (int) (Color.green(color) * 0.9),
+                            (int) (Color.blue(color) * 0.9)));
+                    mDrawInsetsFrameLayout.setInsetBackground(mStatusBarColorDrawable);
+                }
+                mRootView.findViewById(R.id.meta_bar)
+                        .setBackgroundColor(color);
+            }
+        });
+    }
+
+    private Date parsePublishedDate() {
+        try {
+            String date = mCursor.getString(ArticleLoader.Query.PUBLISHED_DATE);
+            return dateFormat.parse(date);
+        } catch (ParseException ex) {
+            Log.e(TAG, ex.getMessage());
+            return new Date();
+        }
     }
 
     public static String getArticleDetailTag(final long articleId) {
@@ -507,6 +524,9 @@ public class ArticleDetailFragment extends Fragment implements
             mDialog.cancel();
         }
     }
+
+
+
 
     private static String getWhiteSpace(int size) {
         StringBuilder builder = new StringBuilder(size);

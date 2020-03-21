@@ -1,16 +1,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="@dimen/progress_dialog_padding"
     android:elevation="@dimen/progress_dialog_elevation"
-    >
+    tools:targetApi="lollipop">
     <ProgressBar
         android:layout_width="@dimen/progress_dialog_elevation_progress_bar_width"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:indeterminateTint="#ff0000"
-        />
+        tools:targetApi="lollipop" />
 
     <TextView
         android:layout_width="@dimen/progress_dialog_textview_width"

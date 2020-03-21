@@ -12,7 +12,7 @@
     android:focusable="true"
     android:foreground="?selectableItemBackground"
     android:elevation="@dimen/mtrl_card_elevation"
-    >
+    tools:targetApi="lollipop">
 
     <android.support.constraint.ConstraintLayout
 
