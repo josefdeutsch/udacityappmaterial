@@ -50,6 +50,8 @@ import static com.example.xyzreader.remote.Config.STATUSBARHEIGHT;
 public class ArticleDetailActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    /** commited to http://udacity.github.io/git-styleguide/ **/
+
     private static final String TAG = "ArticleDetailActivity";
 
     private Cursor mCursor;

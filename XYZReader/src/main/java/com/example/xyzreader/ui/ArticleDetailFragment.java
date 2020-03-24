@@ -83,6 +83,8 @@ import static com.example.xyzreader.remote.Config.XYZREADERNAME;
 
 public class ArticleDetailFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
+
+
     private static final String TAG = "ArticleDetailFragment";
     private Cursor mCursor;
     private long mItemId;
@@ -243,7 +245,7 @@ public class ArticleDetailFragment extends Fragment implements
                     scrollRange = appBarLayout.getTotalScrollRange();
                 }
                 if (scrollRange + verticalOffset == 0) {
-                    collapsingToolbar.setTitle(getWhiteSpace(20) + XYZREADERNAME);
+                    collapsingToolbar.setTitle(getWhiteSpace(10) + XYZREADERNAME);
                     isShow = true;
                 } else if (isShow) {
                     collapsingToolbar.setTitle(EMPTYNONNULL);
