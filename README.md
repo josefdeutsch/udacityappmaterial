@@ -18,14 +18,6 @@ Through this project, you will:
 * Separate an interface into surfaces.
 * Effectively use transitions and motion.
 
-## Features
-* Implement the Shared Element Transition
-* Customize the animation using PageTransformer
-* Show a Snackbar with a button that allows to perform an action
-* Use CoordinatorLayout, CollapsingToolbarLayout
-* Create a custom ThreeTwoImageView to make all the images have the same proportion
-
-
 <a href="https://play.google.com/store/apps/details?id=com.owncloud.android"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="75"></a>
 
 <img src="res/screenshot.png" width="280"/> <img src="res/screenshot2.png" width="280"/> <img src="res/screenshot3.png" width="280"/> 
